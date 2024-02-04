@@ -47,6 +47,7 @@ body {
 
 .item_container {
     margin: 40px 5px;
+    position: sticky;
     /* display: block;
     object-fit: contain;
     background-size: contain; */

@@ -38,6 +38,7 @@ const onReady = function() {
         visibleSlides: 3,
         infinite: true,
         pagination: true,
+        automaticScrolling: false,
         autoSlideDuration: 3000,
         afterClickDelay: 10000
     })
@@ -50,11 +51,13 @@ const onReady = function() {
     new Carousel(document.querySelector('#carousel4'), {
         slidesToScroll: 3,
         visibleSlides: 4,
+        automaticScrolling: false,
         loop: true
     })
     new Carousel(document.querySelector('#carousel5'), {
         slidesToScroll: 1,
         visibleSlides: 1,
+        automaticScrolling: false,
         loop: true,
     })
 }
