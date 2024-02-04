@@ -12,11 +12,13 @@ export class Carousel
     #click = false
     #scrolling = false
     #status
+    #pending = false
     #currentItem = 0
     #element
     #prevButton
     #nextButton
     #items
+    #reverseAnimation = false
     // #items = []
     #inAnimationList = []
     #observer
@@ -43,17 +45,20 @@ export class Carousel
     // }
     #intersectHandler = (entries) => {
         entries.forEach(entry => {
-            if (entry.intersectionRatio > this.#ratio) {
+            if (entry.intersectionRatio > this.#ratio && !this.#click) {
                 // console.log("le status apres intersect quand il n'est pas clicked: "+this.#status)
                 this.#intersect = true
-                // this.#scrolling = true
-                // this.#click = false
+                // this.#reverseAnimation = false
                 this.#whileFalse()
+                this.#animate()
+                return
             } else {
-                // return
+                !this.#reverseAnimation ? this.#bubbleAnimation() : null
                 this.#observe(this.#element)
-            }
+                return
+            } 
         })
+        return
     }
     #moveCallbacks = []
     #isMobile = false
@@ -187,14 +192,98 @@ export class Carousel
      */
     #observe(elements) {
         if (this.#observer) {
+            this.#resolvedPromisesArray = []
             this.#observer.unobserve(elements)
             this.#observer.disconnect()
+            this.#reverseAnimation = true
             this.#intersect = false
+            // this.#reverseAnimation = true
+            // this.#resolvedPromisesArray.push(await wait(100, "je suis devenu hors vue"))
+            // this.#animationPause = true
+            // console.log(this.#loadingBar.classList)
+            
+            
         }
         if (this.#status !== 'clicked') {
             this.#observer = new IntersectionObserver(this.#intersectHandler, this.#options)
             this.#observer.observe(elements)
         }
+    }
+
+    #animate() {
+        console.log('jai demadner le style a defaut')
+        if (this.#loadingBar && this.#reverseAnimation && this.#intersect) {
+            console.log('je souhaite remettre le style a défaut')
+            this.#reverseAnimation = false
+            // this.#loadingBar.removeAttribute('style')
+            this.#loadingBar.classList.remove('carousel__pagination__loadingBar--fade')
+            // this.#loadingBar.classList.add('carousel__pagination__loadingBar')
+            // this.#loadingBar.style.display = 'none'
+            this.#loadingBar.removeAttribute('style')
+            // this.#loadingBar.style.display = 'block'
+            // this.#loadingBar.style.animationDuration = '3000ms'
+            // this.#loadingBar.style.animationDirection = 'normal'
+            // this.#animationPause = true
+            // this.#loadingBar.style.animationDelay = '500ms'
+            // this.#loadingBar.style.animationDelay = '0'
+            // this.#loadingBar.style.display = ''
+            // this.#loadingBar.classList.add('carousel__pagination__loadingBar')
+            console.log('jai tout modifier')
+            return
+        }
+        console.log('je suis sense lavoir eu')
+    }
+
+    async #bubbleAnimation() {
+        // this.#observer.observe(this.#paginationButton)
+        console.log('quel status pour mon reverse : '+this.#reverseAnimation+' ca intersect : '+this.#intersect+' taille de larray : '+ +' Petit check dans le bubble :'+' status : '+this.#status , 'clicked : '+this.#click, 'pending : ' + this.#pending)
+        // console.log(this.#loadingBar.classList.value)
+        if (!this.#scrolling && this.#loadingBar && !this.#reverseAnimation && this.#loadingBar.classList.value !== 'carousel__pagination__loadingBar carousel__pagination__loadingBar--fade') {
+            try {
+                console.log('object2')
+                this.#reverseAnimation = true
+                this.#status = 'inverseAnimation'
+                this.#intersect = false
+            // this.#loadingBar.style.display = 'none'
+            // this.#loadingBar.removeAttribute('style')
+            // this.#loadingBar.classList.remove('carousel__pagination__loadingBar')
+            
+                
+                this.#loadingBar.classList.add('carousel__pagination__loadingBar--fade')
+                // console.log('je reverse')
+                // this.#loadingBar.style.animationDuration = '3000ms'
+                this.#loadingBar.style.animationDirection = 'reverse'
+                // this.#loadingBar.style.animationPlayState = 'paused'
+                
+                
+                this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration, "je souhaite voir l'animation en reverse"))
+                const r = await this.getStates
+                if (r.status === 'rejected') {
+                    throw new Error(`Promesse ${r.reason} non tenable`, {cause: r.reason})
+                }
+                console.log("j'ai demandé un display none")
+                // this.#reverseAnimation = false
+                this.#loadingBar.style.display = 'none' 
+                this.#status = 'inverseComplete'
+                console.log(this.#status)
+                return
+                
+            } catch (error) {
+                console.log(error + 'ca devrait etre r')
+                this.#loadingBar.style.display = 'none' 
+                // this.#reverseAnimation = false
+                // this.#loadingBar.classList.remove('carousel__pagination__loadingBar--fade')
+                // this.#loadingBar.removeAttribute('style')
+                // this.#loadingBar.style.animationDirection = 'normal'
+                // this.#loadingBar.style.display = 'block'
+                return this.#whileFalse()
+            }
+            // this.#loadingBar.style.display = 'block'
+            // console.log('test apres 1000')
+            // this.#loadingBar.classList.remove('carousel__pagination__loadingBar--fade')
+            // this.#loadingBar.style.display = 'none'
+        }
+        return
     }
 
     #disconnectObserver(message) {
@@ -203,116 +292,75 @@ export class Carousel
         throw new Error(message)
     }
     
-    async getStates(promises) {
-        let r
-        promises.forEach(element => {
-            r =   element
-        })
-        let p = this.#promiseState(await r)
-        // promises.forEach(async (promise) =>  {
-        //     r = this.#promiseState(await promise)
-        //     // if (promise.result)
-        //     // .then(  
-        //     //     (reason) =>
-        //     //         console.log(reason + 'test')
-        //     // )
-        // })
-        // console.log(await this.#promiseState(this.p1));
-        // console.log(await this.#promiseState(this.p3));
-        // console.log(await this.#promiseState(this.p4));
-        // this.#resolvedPromisesArray.forEach(async promise => {
-        //     await this.#promiseState(promise)
-        // })
-        // await this.#promiseState(promise)
-        return await p
+    get getStates() {
+        return this.#promiseState(this.#resolvedPromisesArray)
     }
 
-    #promise(promise) {
-        // new Promise((res, rej) => setTimeout(() => rej(300), 100));
+    // get prom() {
+    //     let r
+    //     this.#resolvedPromisesArray.forEach(element => {
+    //         r = element
+    //     })
+    //     return r
+    // }
+
+    #promiseState(promise) {
+        const pendingState = { status: "pending" };
+        
+        return Promise.race(promise, pendingState)
+            .then(
+                (value) =>
+                    value === pendingState ? value : { status: "fulfilled", value },
+                (reason) => ({ status: "rejected", reason }),
+        )
     }
 
-    #whileFalse() {
-
-        // this.p1 = new Promise((res) => setTimeout(() => res(100), 100));
-        this.p1 = new Promise((res) => setTimeout(() => res(this.#autoSlideDuration), this.#autoSlideDuration));
-        this.#resolvedPromisesArray.push(this.p1)
-        this.p2 = wait(200);
-        this.#resolvedPromisesArray.push(this.p2)
-        // this.p2 = new Promise((res) => setTimeout(() => res(200), 200));
-        this.p4 = waitAndFail(100)
-        this.#resolvedPromisesArray.push(this.p4)
-        // this.p3 = new Promise((res, rej) => setTimeout(() => rej(300), 100));
-        this.p3 = new Promise((res, rej) => setTimeout(() => rej(2000), 2000));
-        this.#resolvedPromisesArray.push(this.p3)
-        
-            console.log(this.#resolvedPromisesArray)
-        //     console.log("Immediately after initiation:");
-        
-        // this.getStates(this.#resolvedPromisesArray)
-        // .then(() => {
-        //     setTimeout(() => {
-        //     console.log("After waiting for 100ms:");
-        //     this.getStates(this.#resolvedPromisesArray)
-        // }, 100);
-        // console.log('object')
-        // console.log('test')
-        // })
-        
-        // // this.p3 =   waitAndFail(300)
-        // .catch((e) => {
-        //     console.log(e + ' test')
-        // })
-        try {
-            console.log("Immediately after initiation:");
-            
-            const r = this.getStates(this.#resolvedPromisesArray)
-            // response.forEach(element => {
-            //     console.log(element)
-            // })
-            // .then ((r) => console.log(r))
-            console.log(r)
-            setTimeout(() => {
-                console.log("After waiting for 100ms:");
-                const g = this.getStates(this.#resolvedPromisesArray)
-                console.log(g)
-            }, 100);
-        } catch (error) {
-            console.log(error + ' test')
-        }
-
-
+    
+    async #whileFalse() {
+        debugger
+        console.log('je suis dans while')
         if (this.#scrolling || !this.#intersect) {
+        // if (this.#scrolling || !this.#intersect) {
+        // if (this.#scrolling || !this.#intersect || this.#pending) {
             return
         }
-        // const p = wait(this.#autoSlideDuration)
-        // this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration))
-        // this.#resolvedPromisesArray.push(await waitAndFail(this.#autoSlideDuration))
-        this.#scrolling = true
-        this.#status = 'pending'
-        // await wait(this.#autoSlideDuration)
-        // try {
-        //     // const p1 = await waitAndFail(100)
-        //     // const p = await this.#promiseState(p1)
-        //     await this.#promiseState(this.#resolvedPromisesArray)
+        
+        try {
+            // this.#reverseAnimation = false
+            if (this.#click || this.#status === 'clicked') {
+                // this.#resolvedPromisesArray.push(await waitAndFail(this.#autoSlideDuration, "j'ai clic"))
+                // this.#status = 'clicked'
+                this.#resolvedPromisesArray.push(await waitAndFail(100, "j'ai clic"))
+                array = this.#resolvedPromisesArray.length 
+            } else {
+                this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration, "J'ai demandé un slide normal"))
+            }
+            const array = this.#resolvedPromisesArray.length
+            // console.log('taille de larray : '+array +' Petit check dans le while :'+' status : '+this.#status , 'clicked : '+this.#click, 'pending : ' + this.#pending)
+            // if (this.#pending) return
+            const r = await this.getStates
+            if (r.status === 'rejected') {
+                    throw new Error(`Promesse ${r.reason} non tenable`, {cause: r.reason})
+                }
+            // if (this.#click || this.#status === 'clicked') {
+            //     // console.log('jai ete click')
+            //     // console.log("click status : " +this.#click + " status global : " +this.#status + "array length: "+array)
+            //     // this.#click = true
+            //     // this.#resolvedPromisesArray.push(await waitAndFail(500, "Ca commence à spam..."))
+            //     return
+            // }
+            // array = this.#resolvedPromisesArray.length
+            // if (this.#status !== 'clicked') {
             
-        //     console.log(this.#resolvedPromisesArray)
-        // } catch (e) {
-        //     console.log(e + "test")
-        // }
-        // await this.#promiseState(await waitAndFail(this.#autoSlideDuration))
-        console.log('')
-            // console.log(this.#resolvedPromisesArray)
-        // try {
-        //     Promise.race(this.#resolvedPromisesArray)
-        //         .then (
-        //             (value) =>
-        //                 value === 3000 ? this.#test() : this.#whileFalse()
-        //         )
-        //         // console.log("e")
-        //         // this.#test()
-        // } catch (e) {
-        //     console.log(e + "test")
-        // }
+            if (!this.#click) {
+                this.#scrolling = true
+                // this.#pending = true
+                this.#onFulfilled(array)
+            }
+            return
+        } catch (error) {
+            this.#onReject()
+        }
     }
     // #whileFalse() {
     //     if (this.#scrolling || !this.#intersect) {
@@ -333,101 +381,69 @@ export class Carousel
     //             return this.#test()
     //         })
     // }
-    #promiseState(promise) {
-        const pendingState = { status: "pending" };
-        
-        return Promise.race([promise, pendingState])
-            .then(
-                (value) =>
-                    value === pendingState ? value : { status: "fulfilled", value },
-                (reason) => ({ status: "rejected", reason }),
-        )
-    }
-    async #test() {
-        try {
-            if (!this.#click && this.#status === 'pending') {
-                this.#next()
-                this.#scrolling = false
-                this.#status = 'completed'
-                console.log(wait(this.#autoSlideDuration) +" celle qui a été exécutée à 3000")
-                return this.#whileFalse()
-            }
-            if (this.#status === 'completed' || this.#status === 'clickComplete') {
-                console.log(wait(this.#autoSlideDuration) +" il va return")
-                return
-            // this.#whileFalse()
-            }
-        } catch (error) {
-            if (this.#click && this.#status === 'clicked') {
-                this.#click = false
-                // waitAndFail(this.#autoSlideDuration)
-                wait(this.#autoSlideDuration)
-                    .then (() => {
-                        this.#scrolling = false
-                        this.#status = 'clickComplete'
-                        // this.#next()
-                    })
-                    .then(() => {
-                        console.log(wait(this.#autoSlideDuration) +" celle qui devrait être à 0")
-                        // this.#next()
-                        this.#whileFalse()
-                    })
-                    .catch((e) => {
-                        console.log(e)
-                    })
-            }
-        }
-    }
-    // async #test() {
-    //     // this.#scrolling = true
-    //     // console.log(this.#resolvedPromisesArray)
-    //     // this.#status = 'pending'
-    //     // this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration))
-    //     if (this.#click && this.#status === 'clicked') {
-    //         this.#click = false
-    //         // waitAndFail(this.#autoSlideDuration)
-    //         const p1 = await waitAndFail(200)
-    //         const p = await this.#promiseState(p1)
-    //         // console.log(p)
-
-    //         // await wait(1000)
-    //         console.log(await wait(1000))
-    //         // try {
-    //         //     const p1 = waitAndFail(100)
-    //         //     const p = await this.#promiseState(p1)
-    //         //     console.log(p)
-    //         //     this.#scrolling = false
-    //         //     this.#status = 'clickComplete'
-    //         //     // this.#next()
-    //         //     this.#whileFalse()
-                    
-    //         //         // if (value) {
-    //         //         //     value === 3000 ? this.#next() : this.#whileFalse()
-    //         //         // }
-                            
-                    
-    //         //         // .then (
-    //         //         //     (value) =>
-    //         //         //         value === 3000 ? this.#next() : this.#whileFalse()
-    //         //         // )
-    //         //         // this.#whileFalse()
-    //         //         // console.log("e")
-    //         //         // this.#test()
-    //         // } catch (reason) {
-    //         //     console.error("failed with reason:", reason);
-    //         // }
-    //     }
-    //     if (!this.#click && this.#status === 'pending') {
-    //         this.#next()
-    //         this.#scrolling = false
-    //         this.#status = 'completed'
-    //         // console.log(wait(this.#autoSlideDuration) +" celle qui a été exécutée à 3000")
-    //         this.#whileFalse()
-    //     }
-    //     if (this.#status === 'completed' || this.#status === 'clickComplete') {
-    //         return
+    
+    // #test() {
+    //     try {
+    //         if (!this.#click && this.#status === 'pending') {
+    //             this.#next()
+    //             this.#scrolling = false
+    //             this.#status = 'completed'
+    //             console.log(wait(this.#autoSlideDuration) +" celle qui a été exécutée à 3000")
+    //             return this.#whileFalse()
+    //         }
+    //         if (this.#status === 'completed' || this.#status === 'clickComplete') {
+    //             console.log(wait(this.#autoSlideDuration) +" il va return")
+    //             return
+    //         // this.#whileFalse()
+    //         }
+    //     } catch (error) {
+    //         if (this.#click && this.#status === 'clicked') {
+    //             this.#click = false
+    //             // waitAndFail(this.#autoSlideDuration)
+    //             wait(this.#autoSlideDuration)
+    //                 .then (() => {
+    //                     this.#scrolling = false
+    //                     this.#status = 'clickComplete'
+    //                     // this.#next()
+    //                 })
+    //                 .then(() => {
+    //                     console.log(wait(this.#autoSlideDuration) +" celle qui devrait être à 0")
+    //                     // this.#next()
+    //                     this.#whileFalse()
+    //                 })
+    //                 .catch((e) => {
+    //                     console.log(e)
+    //                 })
+    //         }
     //     }
     // }
+    
+    #onFulfilled(arrayLength) {
+        // console.log('je suis dans onfill')
+        // if (this.#click === false && this.#pending) {
+        if (this.#click === false) {
+            this.#scrolling = false
+            // this.#pending = false
+            if (arrayLength <= this.#resolvedPromisesArray.length) this.#next()
+            this.#resolvedPromisesArray = []
+            this.#status = 'completed'
+            if (this.#status === 'completed') return this.#whileFalse()
+        }
+        return
+    }
+    #onReject() {
+        // console.log('je suis dans onreject')
+        if (this.#click) {
+            // this.#resolvedPromisesArray = []
+            this.#animate()
+            this.#intersect = true
+            this.#click = false
+            this.#scrolling ? this.#scrolling = false : null
+            this.#status = 'clickComplete'
+            if (this.#status === 'clickComplete') return this.#whileFalse()
+        }
+        return
+    }
     // #test() {
     //     if (this.#click && this.#status === 'clicked') {
     //         this.#click = false
@@ -502,11 +518,16 @@ export class Carousel
 
     #createEventListenerFromClick(object, event, animationDelay, funct, args) {
         object.addEventListener('click', () => {
+            // debugger
             funct(args)
             this.#status = 'clicked'
+            this.#resolvedPromisesArray = []
+            this.#scrolling = true
+            this.#click = true
+            this.#reverseAnimation = false
             let newEvent = new CustomEvent(`${event}`, {
                 bubbles: false,
-                detail: object
+                detail: object,
             }, {once: true})
             object.dispatchEvent(newEvent)
             this.#delayAnimation(animationDelay)
@@ -514,28 +535,31 @@ export class Carousel
     }
 
     #debounce(object, event) {
-        object.addEventListener(event, debounce(async() => {
-            if (this.#status === 'clicked') {
-                this.#click = true
-                this.#scrolling = false
-                this.#resolvedPromisesArray.push(await waitAndFail(100))
-                return this.#test()
-                
-                // try {
-                //     Promise.race(this.#resolvedPromisesArray)
-                //         .then (
-                //             (value) =>
-                //                 value === 100 ? this.#test() : this.#whileFalse()
-                //         )
-                //         console.log(this.#resolvedPromisesArray)
-                //         // console.log("e")
-                //         // this.#test()
-                // } catch (e) {
-                //     console.log(e + "test")
-                // }
+        object.addEventListener(event, debounce( () => {
+            let array = this.#resolvedPromisesArray.length
+            if (this.#status === 'clicked' || this.#click === true) {
+                if (array > this.#resolvedPromisesArray.length) {
+                    this.#resolvedPromisesArray = []
+                    return
+                } else {
+                    // this.#click = true
+                    this.#scrolling = false
+                    // this.#resolvedPromisesArray = []
+                    this.#whileFalse()
+                }
             }
         }, (this.#afterClickDelay)))
     }
+
+    #cancelPromise() {
+        const actualPromise = new Promise((resolve, reject) => { setTimeout(resolve, 10000) });
+        let cancel;
+        const cancelPromise = new Promise((resolve, reject) => {
+        cancel = reject.bind(null, { canceled: true })
+        })
+        const cancelablePromise = Object.assign(Promise.race([actualPromise, cancelPromise]), { cancel });
+    }
+
     // #debounce(object, event) {
     //     object.addEventListener(event, debounce(() => {
     //         if (this.#status === 'clicked') {
@@ -550,6 +574,8 @@ export class Carousel
 
     #delayAnimation(duration) {
         if (this.#loadingBar) {
+            // this.#loadingBar.style.display = 'block'
+            // this.#loadingBar.style.animationDirection = 'normal'
             this.#loadingBar.style.animationDuration = `${duration}ms`
         }
     }
@@ -579,6 +605,7 @@ export class Carousel
             pagination.append(this.#paginationButton)
             buttons.push(this.#paginationButton)
         }
+        // this.#observe(pagination)
         this.#onMove(index => {
             let count = this.#items.length - 2 * this.#offset
             let activeButton = buttons[Math.floor(((index - this.#offset) % count) / this.#slidesToScroll)]
@@ -589,7 +616,7 @@ export class Carousel
                 })
                 activeButton.classList.add('carousel__pagination__button--active')
                 activeButton.append(this.#loadingBar)
-                this.#delayAnimation(this.#autoSlideDuration)
+                if (!this.#click) this.#delayAnimation(this.#autoSlideDuration)
             }
         })
     }
@@ -627,8 +654,6 @@ export class Carousel
         } else if ((index >= this.#items.length) || (this.#items[this.#currentItem + this.#visibleSlides] === undefined) && index > this.#currentItem) {
             if (this.options.loop) {
                 index = 0
-            } else {
-                return
             }
         }
         let translateX = index * (-100 / this.#items.length)

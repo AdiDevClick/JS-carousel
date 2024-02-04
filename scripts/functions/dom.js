@@ -36,10 +36,12 @@ export const debounce = function(funct, duration) {
  * @param {number} duration 
  * @returns {Promise}
  */
-export function wait(duration) {
+export function wait(duration, message) {
     return new Promise((resolve) => {
         setTimeout(() => {
-            resolve(duration)
+            resolve(message)
+            // resolve(`${duration} ${message}`)
+            // resolve(duration)
         }, duration)
     })
 }
@@ -47,10 +49,12 @@ export function wait(duration) {
  * @param {number} duration 
  * @returns {Promise}
  */
-export function waitAndFail(duration) {
+export function waitAndFail(duration, message) {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            reject(duration)
+            reject(message)
+            // reject(`${duration} ${message}`)
+            // reject(duration))
         }, duration)
     })
 }

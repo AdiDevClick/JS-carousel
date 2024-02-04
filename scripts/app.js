@@ -38,8 +38,8 @@ const onReady = function() {
         visibleSlides: 3,
         infinite: true,
         pagination: true,
-        autoSlideDuration: 5000,
-        afterClickDelay: 0
+        autoSlideDuration: 3000,
+        afterClickDelay: 10000
     })
     new Carousel(document.querySelector('#carousel3'), {
         slidesToScroll: 2,
