@@ -31,14 +31,14 @@ const onReady = function() {
         loop: true,
         pagination: true,
         autoSlideDuration: 3000,
-        afterClickDelay: 1000
+        afterClickDelay: 5000
     })
     new Carousel(document.querySelector('#carousel2'), {
         slidesToScroll: 3,
         visibleSlides: 3,
         infinite: true,
         pagination: true,
-        automaticScrolling: false,
+        automaticScrolling: true,
         autoSlideDuration: 3000,
         afterClickDelay: 10000
     })

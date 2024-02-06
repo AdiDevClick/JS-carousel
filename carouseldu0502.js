@@ -8,16 +8,15 @@ export class Carousel
      * @callback moveCallback
      * @param {number} index
      */
-
+    #paginationButton
+    #click = false
     #scrolling = false
-    #status = 'pending'
+    #status
     #currentItem = 0
     #element
     #prevButton
     #nextButton
     #items
-    // #items = []
-
     #observer
     #intersect
     #ratio = .6
@@ -26,10 +25,14 @@ export class Carousel
         rootMargin: '0px',
         threshold: this.#ratio
     }
+
     #intersectHandler = (entries) => {
         entries.forEach(entry => {
-            if (entry.intersectionRatio > this.#ratio) {
+            if (entry.intersectionRatio > this.#ratio && !this.#click) {
                 this.#intersect = true
+                if (this.#loadingBar) {
+                    this.#loadingBar.style.display = null
+                }
                 this.#whileFalse()
             } else {
                 this.#observe(this.#element)
@@ -40,7 +43,7 @@ export class Carousel
     #isMobile = false
     #loadingBar
     #offset = 0
-    #move
+    #resolvedPromisesArray = []
 
     /**
      * @param {HTMLElement} element 
@@ -50,8 +53,11 @@ export class Carousel
      * @param {boolean} [options.loop=false] Permet de définir si l'on souhaite boucler en fin de slide
      * @param {boolean} [options.pagination=false] Permet de définir un nombre de page
      * @param {boolean} [options.navigation=true] Permet de définir la navigation
-     * @param {boolean} [options.infinite=false] 
-     * @param {boolean} [options.automaticScrolling=true] Permet de définir le scrolling automatique toutes les 3s
+     * // IMPORTANT !! : si INFINITE = true : l'option loop DOIT ETRE FALSE
+     * @param {boolean} [options.infinite=false]
+     * @param {boolean} [options.automaticScrolling=true] Permet de définir le scrolling automatique
+     * @param {boolean} [options.autoSlideDuration=3000] Permet de définir le délai entre chaque auto scroll - par défaut : 3s
+     * @param {boolean} [options.afterClickDelay=10000] Permet de définir un délai après intéraction de l'utilisateur - par défaut : 10s
      */
     constructor(element, options = {}) {
         this.#element = element
@@ -62,7 +68,9 @@ export class Carousel
             pagination: false,
             navigation: true,
             infinite: false,
-            automaticScrolling: true
+            automaticScrolling: true,
+            autoSlideDuration: 3000,
+            afterClickDelay: 10000
         }, options)
 
         if (options.loop && options.infinite) {
@@ -109,6 +117,7 @@ export class Carousel
         if (this.options.pagination) {
             this.#createPagination()
         }
+        
         // const doc = document.querySelector('.carousel_container')
         // window.addEventListener('DOMContentLoaded', () => {
         // this.#observer = new IntersectionObserver(this.#intersectHandler, this.#options)
@@ -117,14 +126,13 @@ export class Carousel
         // }
         // this.#observer.observe(this.#element)
         // })
-        // this.#whileFalse()
         
         // Evènements
         this.#moveCallbacks.forEach(cb => cb(this.#currentItem))
-        if (this.options.automaticScrolling) {
+        if (this.options.automaticScrolling && !this.#click) {
             this.#observe(this.#element)
         }
-        
+
         this.#onWindowResize()
         window.addEventListener('resize', this.#onWindowResize.bind(this))
         this.root.addEventListener('keyup', e => this.#accessibilityKeys(e))
@@ -158,12 +166,16 @@ export class Carousel
      */
     #observe(elements) {
         if (this.#observer) {
+            // this.#loadingBar.style.animationName = 'fadeOut'
+            this.#resolvedPromisesArray = []
             this.#observer.unobserve(elements)
             this.#observer.disconnect()
             this.#intersect = false
         }
-        this.#observer = new IntersectionObserver(this.#intersectHandler, this.#options)
-        this.#observer.observe(elements)
+        if (this.#status !== 'clicked') {
+            this.#observer = new IntersectionObserver(this.#intersectHandler, this.#options)
+            this.#observer.observe(elements)
+        }
     }
 
     #disconnectObserver(message) {
@@ -171,51 +183,66 @@ export class Carousel
         // this.#element.remove()
         throw new Error(message)
     }
+    
+    get getStates() {
+        return this.#promiseState(this.#resolvedPromisesArray)
+    }
 
-    #whileFalse() {
+    #promiseState(promise) {
+        const pendingState = { status: "pending" };
+        
+        return Promise.race(promise, pendingState)
+            .then(
+                (value) =>
+                    value === pendingState ? value : { status: "fulfilled", value },
+                (reason) => ({ status: "rejected", reason }),
+        )
+    }
+    
+    async #whileFalse() {
         if (this.#scrolling || !this.#intersect) {
             return
         }
-        if (this.#status === 'clicked') {
+        try {
+            if (this.#click || this.#status === 'clicked') {
+                this.#resolvedPromisesArray.push(await waitAndFail(100, "j'ai clic"))
+            } else {
+                this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration, "J'ai demandé un slide normal"))
+            }
+            const array = this.#resolvedPromisesArray.length
+            const r = await this.getStates
+            if (r.status === 'rejected') {
+                    throw new Error(`Promesse ${r.reason} non tenable`, {cause: r.reason})
+                }
+            if (!this.#click) {
+                this.#scrolling = true
+                this.#onFulfilled(array)
+            }
             return
+        } catch (error) {
+            this.#onReject()
         }
-        // } else {
-        this.#status = 'pending'
-        this.#scrolling = true
-            wait(3000)
-                .then(() => {
-                    if (this.#status === 'pending') {
-                        this.#next()
-                        this.#status = 'completed'
-                    }
-                })
-                // .then(() => {
-                //     if (this.#status === 'clicked') {
-                //         waitAndFail(500)
-                //     } else {
-                //         wait(500)
-                //     }
-                // })
-                .then(() => {
-                    if (this.#status === 'completed') {
-                        this.#scrolling = false
-                        this.#whileFalse()
-                    }
-                })
-                // .catch(console.log)
-            // .then(() => {
-            //     console.log(this.#status)
-            //     this.#whileFalse()
-            // nextButton.addEventListener('click', debounce(() => {
-            //     if (checkIndex !== this.#currentItem) {
-            //         this.whileFalse()
-            //         checkIndex = this.#currentItem
-            //     }
-            // }, 500))
-            // })
-        
     }
 
+    #onFulfilled(arrayLength) {
+        if (this.#click === false) {
+            this.#scrolling = false
+            if (arrayLength <= this.#resolvedPromisesArray.length) this.#next()
+            this.#resolvedPromisesArray = []
+            this.#status = 'completed'
+            if (this.#status === 'completed') return this.#whileFalse()
+        }
+        return
+    }
+    #onReject() {
+        if (this.#click) {
+            this.#click = false
+            this.#scrolling = false
+            this.#status = 'clickComplete'
+            if (this.#status === 'clickComplete') return this.#whileFalse()
+        }
+        return
+    }
     
     /**
      * Crer les flèches de navigation
@@ -229,11 +256,9 @@ export class Carousel
         })
         this.root.append(this.#nextButton)
         this.root.append(this.#prevButton)
-        // let checkIndex = this.#currentItem
-        // this.#prevButton.addEventListener('click', this.#prev.bind(this))
         
-        this.#createEventListenerFromClick(this.#nextButton, 'next', 13000, this.#next.bind(this))
-        this.#createEventListenerFromClick(this.#prevButton, 'prev', 13000, this.#prev.bind(this))
+        this.#createEventListenerFromClick(this.#nextButton, 'next', (this.#afterClickDelay + this.#autoSlideDuration), this.#next.bind(this))
+        this.#createEventListenerFromClick(this.#prevButton, 'prev', (this.#afterClickDelay + this.#autoSlideDuration), this.#prev.bind(this))
         this.#debounce(this.#nextButton, 'next')
         this.#debounce(this.#prevButton, 'prev')
         if (this.options.loop === true) return
@@ -260,24 +285,31 @@ export class Carousel
         object.addEventListener('click', () => {
             funct(args)
             this.#status = 'clicked'
+            this.#resolvedPromisesArray = []
+            this.#scrolling = true
+            this.#click = true
             let newEvent = new CustomEvent(`${event}`, {
                 bubbles: false,
-                detail: this.object
-            })
+                detail: object
+            }, {once: true})
             object.dispatchEvent(newEvent)
             this.#delayAnimation(animationDelay)
         })
     }
 
     #debounce(object, event) {
-        object.addEventListener(event, debounce(() => {
-            // if (checkIndex !== this.#currentItem) {
-            if (this.#status !== 'completed' || this.#status !== 'pending') {
-                this.#status = 'completed'
-                this.#scrolling = false
-                this.#whileFalse()
+        object.addEventListener(event, debounce( () => {
+            let array = this.#resolvedPromisesArray.length
+            if (this.#status === 'clicked' || this.#click === true) {
+                if (array > this.#resolvedPromisesArray.length) {
+                    this.#resolvedPromisesArray = []
+                    return
+                } else {
+                    this.#scrolling = false
+                    this.#whileFalse()
+                }
             }
-        }, 10000))
+        }, (this.#afterClickDelay)))
     }
 
     #delayAnimation(duration) {
@@ -295,49 +327,34 @@ export class Carousel
         let buttons = []
         this.root.append(pagination)
         for (let i = 0; i < this.#items.length - 2 * this.#offset; i = i + this.#slidesToScroll) {
-            let button = createElement('div', {class: 'carousel__pagination__button'})
-            this.#createEventListenerFromClick(button, 'paginationButton', 13000, this.#goToItem.bind(this), i + this.#offset)
-            // button.addEventListener('click', () => {
-            //     this.#status = 'clicked'
-            //     this.#goToItem(i + this.#offset)
-            //     let event = new CustomEvent('paginationButton', {
-            //         bubbles: false,
-            //         detail: button
-            //     })
-            //     button.dispatchEvent(event)
-            //     this.#delayAnimation(13000)
-            // })
-            
-            pagination.append(button)
-            this.#debounce(button, 'paginationButton')
-            buttons.push(button)
+            this.#paginationButton = createElement('div', {class: 'carousel__pagination__button'})
+            this.#createEventListenerFromClick(this.#paginationButton, 'paginationButton', this.#afterClickDelay + this.#autoSlideDuration, this.#goToItem.bind(this), i + this.#offset)
+        
+            this.#debounce(this.#paginationButton, 'paginationButton')
+            pagination.append(this.#paginationButton)
+            buttons.push(this.#paginationButton)
         }
         this.#onMove(index => {
             let count = this.#items.length - 2 * this.#offset
-            let activeButton = buttons[Math.floor(((index - this.#offset) % count) / this.#slidesToScroll)]
-            if (activeButton) {
+            this.activeButton = buttons[Math.floor(((index - this.#offset) % count) / this.#slidesToScroll)]
+            if (this.activeButton) {
                 buttons.forEach(button => {
                     button.classList.remove('carousel__pagination__button--active')
                     this.#loadingBar.remove()
                 })
-                activeButton.classList.add('carousel__pagination__button--active')
-                activeButton.append(this.#loadingBar)
-                this.#delayAnimation(3000)
+                this.activeButton.classList.add('carousel__pagination__button--active')
+                this.activeButton.append(this.#loadingBar)
+                if (!this.#click) this.#delayAnimation(this.#autoSlideDuration)
             }
         })
     }
 
     #next() {
-        // debugger
         this.#goToItem(this.#currentItem + this.#slidesToScroll)
     }
 
     #prev() {
-        this.#move = 'prev'
-        // debugger
-        console.log(this.#currentItem + ' current item')
         this.#goToItem(this.#currentItem - this.#slidesToScroll)
-        console.log(this.#offset + ' offset')
     }
 
     /**
@@ -417,5 +434,15 @@ export class Carousel
     /** @returns {number} */
     get #visibleSlides() {
         return this.#isMobile ? 1 : this.options.visibleSlides
+    }
+
+    /** @returns {number} */
+    get #autoSlideDuration() {
+        return this.options.autoSlideDuration
+    }
+
+    /** @returns {number} */
+    get #afterClickDelay() {
+        return this.options.afterClickDelay
     }
 }

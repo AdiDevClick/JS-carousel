@@ -47,7 +47,7 @@ body {
 
 .item_container {
     margin: 40px 5px;
-    position: sticky;
+    /* position: sticky; */
     /* display: block;
     object-fit: contain;
     background-size: contain; */
@@ -70,15 +70,15 @@ body {
     transform: translate3d(0, -10px, 0);
     /* display: flex; */
     /* position: absolute; */
-    bottom: 0;
+    /* bottom: 0;
     right: 0;
     top: -100px;
     left: 150px;
     display: block;
     -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px); */
     /* position: absolute; */
-    z-index: 90000;
+    /* z-index: 90000; */
     /* width: 100%; */
     /* width: 20%;  */
 }
@@ -99,19 +99,19 @@ body {
 .item_container img:hover{
     /* display: flex; */
     /* flex-wrap: wrap; */
-    position: absolute;
+    /* position: absolute;
     top: 50%;
     left: 0;
     right: 0;
     bottom: 50%;
     z-index: 9000;
     -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px); */
     /* overflow: hidden; */
     /* width: 100%; */
     /* object-fit: contain; */
     /* background-size: contain; */
-    max-width: 150%;
+    /* max-width: 150%; */
 }
 
 .item__body {
@@ -297,13 +297,14 @@ body {
 
 .carousel__pagination__button {
     background-color: white;
-    width: 10px;
-    height: 10px;
+    width: 10px; /* j'ai mis 15px au début */
+    height: 6px; /* j'ai mis 7px au début */
     border-radius: 100vh;
     display: inline-block;
     margin: 0 3px;
     box-shadow: -5px 4px 50px -1px rgba(0,0,0,0.35);
-    transition: transform .1s, width .4s cubic-bezier(0.755, 0.05, 0.855, 2.06);
+    transition: transform .1s, height .7s cubic-bezier(1, 0, 0, 1), width .5s cubic-bezier(0.755, 0.05, 0.855, 2.06); /* j'ai mis une width de .4s au début */
+    /* transition: transform .1s, height .4s cubic-bezier(1, 0, 0, 1); j'ai mis une width de .4s au début */
     cursor: pointer;
     transform: scale(0.5);
 }
@@ -360,6 +361,20 @@ body {
 }
 
 @keyframes slideRight {
+    from {
+        /* transform: translateX(0px); */
+        height: 10px;
+        /* height: 12px; */
+        width: 24px;
+    }
+    to {
+        /* transform: translateX(5px); */
+        height: 5px;
+        /* height: 8px; */
+        width: 28px;
+    }
+}
+@keyframes defaultslideRight {
     from {
         /* transform: translateX(0px); */
         height: 12px;
