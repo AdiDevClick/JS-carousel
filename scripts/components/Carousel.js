@@ -72,6 +72,7 @@ export class Carousel
     #loadingBar
     #offset = 0
     #resolvedPromisesArray = []
+    #eventAction
 
     /**
      * @param {HTMLElement} element 
@@ -170,9 +171,13 @@ export class Carousel
             this.startTime
         }
         this.#items.forEach(item => {
-            this.#createEventListenerFromMouse(item, 'mouseover' , 'mouseDebounce', false, this.#onHover.bind(this))
+            // this.#createEventListenerFromMouse(item, 'mousemove' , 'mouseDebounce', false, this.#debounceMouse(item, 'mouseDebounce'))
+            this.#createEventListenerFromMouse(item, 'mousemove' , 'mouseDebounce', false, this.#onHover.bind(this))
             this.#debounceMouse(item, 'mouseDebounce')
-            // item.addEventListener('mouseover', e => this.#onHover(e))
+            // console.log(te.detail + 'ceci est mon e')
+            // item.addEventListener('mousemove', e => this.#onHover(e))
+            item.addEventListener('mouseout', e => this.#onPointerOut(e))
+
         })
     }
 
@@ -321,11 +326,19 @@ export class Carousel
 
     async #whileFalse() {
         // debugger
+        
         console.log('je suis dans while')
+
         if (this.#scrolling || !this.#intersect || this.#status === 'hovered') {
         // if (this.#scrolling || !this.#intersect) {
+            console.log('je suis le status qui a fail : ' + this.#status)
+            if (this.#status === 'hoveredCompleted') {
+                null
+            } else {
+                return
+            }
         // if (this.#scrolling || !this.#intersect || this.#pending) {
-            return
+            // return
         }
         
         try {
@@ -473,56 +486,102 @@ export class Carousel
     }
 
     #onHover() {
+        debugger
+        if (this.#status === 'hovered') return
+        // object.removeEventListener('mouseover', this.#onPointerOut(e))
+        // console.log(e)
         // e.preventDefault()
+        // console.log(this.#eventAction)
+        // this.offsetY = this.#eventAction.clientY
+        // console.log(e + 'test de hover >>>>>')
+        // console.log(e)
         console.log('je suis en train de hover')
         this.#resolvedPromisesArray = []
         this.endTime
-        delete this.endTime
+        this.#status === 'canResume' ? null : this.#status = 'hovered'
+        // this.#click = true
+        // delete this.endTime
         // if (this.#status === 'hovered') return
-        this.#status = 'hovered'
+        // this.#items.forEach(item => {
+        //     this.#debounceMouse(item, 'mouseDebounce')
+        // })
         if (this.#loadingBar) this.#loadingBar.style.animationPlayState = 'paused'
-        this.#click = true
+        
+        // this.#debounceMouse(item, 'mouseDebounce')
         // e.removeEventListener('mouseover', this.#onHover)
-        this.#items.forEach(item => {
-            item.addEventListener('mouseout', e => this.#onPointerOut(e), {once: true})
-        })
+        // if (this.#status === 'canResume') {
+        //     this.#items.forEach(item => {
+        //         item.addEventListener('mouseout', e => {
+        //             this.#status = 'hoveredCompleted'
+        //             this.#click = false
+        //             this.currentTime
+        //             this.#resolvedPromisesArray = []
+        //             if (this.#loadingBar) this.#loadingBar.style.animationPlayState = 'running'
+        //             console.log('ca devrait run')
+        //         }, {once: true})
+        //     })
+        //     return this.#observe(this.#element)
+        // }
+            // this.#items.forEach(item => {
+                // this.#debounceMouse(item, 'mouseDebounce')
+                
+                // item.addEventListener('mouseout', e => this.#onPointerOut(e), {once: true})
+            // })
+            // this.#resolvedPromisesArray = []
     }
 
-    async #onPointerOut(e) {
-        // debugger
+    #onPointerOut(e) {
+        debugger
         // e.preventDefault()
-        this.#status = 'hoveredCompleted'
-        console.log(this.#status)
-        this.#click = false
-        if (this.#loadingBar) this.#loadingBar.style.animationPlayState = 'running'
-        // await wait(this.#currentTime)
-        // this.#status = null
-        // this.#next()
-        this.currentTime
-        // return this.#observe(this.#element)
+        if (this.#status === 'canResume') {
+            
+            console.log('je suis dans pointerout')
+            this.#status = 'hoveredCompleted'
+            console.log(this.#status)
+            this.#click = false
+            
+        //    this.#loadingBar.style.animationPlayState = 'running'
+            // console.log('ca devrait run')
+            // await wait(this.#currentTime)
+            // this.#status = null
+            // this.#next()
+            
+            this.currentTime
+            this.#resolvedPromisesArray = []
+            if (this.#status === 'hoveredCompleted') {
+                console.log('je devrais pouvoir résume normalement')
+                if (this.#loadingBar) this.#loadingBar.style.animationPlayState = 'running'
+                return this.#observe(this.#element)
+            }
+
+        }
+        return
+        // this.#resolvedPromisesArray = []
+        
     }
 
     #createEventListenerFromMouse(object, eventToListen , customEvent, animationDelay = false, funct = null, args = null) {
-        object.addEventListener(eventToListen, () => {
+        object.addEventListener(eventToListen, (e) => {
             // debugger
             if (funct) funct(args)
-            
+            this.#eventAction = e.clientX
             // this.#status = 'clicked'
             this.#resolvedPromisesArray = []
             this.#click = true
             // this.#reverseAnimation = false
             let newEvent = new CustomEvent(`${customEvent}`, {
                 bubbles: false,
-                detail: object,
+                detail: e
             }, {once: true})
             object.dispatchEvent(newEvent)
+            // console.log(newEvent.detail)
             animationDelay ? this.#getAnimationDelay : null
             // this.#DelayAnimation(animationDelay)
         })
     }
     
     #createEventListenerFromClick(object, eventToListen , customEvent, animationDelay = false, funct, args) {
-        object.addEventListener(eventToListen, () => {
+        object.addEventListener(eventToListen, (e) => {
             // debugger
             funct(args)
             this.#status = 'clicked'
@@ -532,7 +591,7 @@ export class Carousel
             // this.#reverseAnimation = false
             let newEvent = new CustomEvent(`${customEvent}`, {
                 bubbles: false,
-                detail: object,
+                detail: this.e
             }, {once: true})
             object.dispatchEvent(newEvent)
             animationDelay ? this.#getAnimationDelay : null
@@ -540,18 +599,64 @@ export class Carousel
         })
     }
 
+    // #debounceMouse(object, event) {
+    //     object.addEventListener(event, debounce((e) => {
+    //         console.log(e.detail)
+    //     }, 1000))
+    // }
+
     // #debounce(object, event, afterClickDelay) {
     #debounceMouse(object, event) {
-        object.addEventListener(event, debounce(() => {
+        
+        object.addEventListener(event, debounce((e) => {
+            // this.#onHover()
+            // this.endTime
+            // this.#status = 'hovered'
+            // if (this.#loadingBar) this.#loadingBar.style.animationPlayState = 'paused'
+            // this.#click = true
+            const mouseEvent = e.detail
+            console.log(this.#eventAction + ' mon eventactiob')
             console.log('petit test de debounce')
+            let X = mouseEvent.clientX
+            let Y = mouseEvent.clientY
+            let mousePosition = X
+            // console.log(mousePosition)
+            if (mousePosition !== this.#eventAction) {
+                mousePosition = X
+                console.log(mousePosition)
+                console.log('jai bougé')
+                
+                return
+                // return this.#observe(this.#element)
+            }
+            this.#status = 'canResume'
+            
+            console.log('je peux avancer')
+            // 
+            // this.#click = false
+            // object.addEventListener('mouseout', e => {
+            //     this.#status = 'hoveredCompleted'
+            //     this.#click = false
+            //     this.currentTime
+            //     this.#resolvedPromisesArray = []
+            //     if (this.#loadingBar) this.#loadingBar.style.animationPlayState = 'running'
+            //     console.log('ca devrait run')
+            // }, {once: true})
+            // object.addEventListener('mouseout', e => this.#onPointerOut(e), {once: true})
+            // this.#items.forEach(item => {
+            //     item.addEventListener('mouseout', e => this.#onPointerOut(e), {once: true})
+            // })
             // this.#onHover()
             // debugger
             // this.#items.forEach(item => {
             //     item.addEventListener('mouseout', e => this.#onPointerOut(e), {once: true})
             // })
-            // this.#onPointerOut()
-            return this.#observe(this.#element)
-        }, (1500)))
+            return this.#onPointerOut()
+            // if (this.#status === 'hoveredCompleted') return this.#observe(this.#element)
+            // return this.#observe(this.#element)
+            // return this.#observe(this.#element)
+        }, (5000)))
+        // }, (1500)), {once: true})
     }
 
     /**

@@ -21,16 +21,43 @@ export function createElement(tagName, attributes = {}) {
 export const debounce = function(funct, duration) {
     let timer
     return (...args) => {
+        // let args = arguments
         let context = this
         return new Promise((resolve) => {
             clearTimeout(timer)
             timer = setTimeout(() => {
-                funct.apply(context, ...args)
+                funct.apply(context, args)
                 resolve(duration)
             }, duration)
         })
     }
 }
+// export const debounce = function(funct, duration) {
+//     let timer
+//     return function() {
+//         let args = arguments
+//         let context = this
+//         return new Promise((resolve) => {
+//             clearTimeout(timer)
+//             timer = setTimeout(() => {
+//                 funct.apply(context, args)
+//                 resolve(duration)
+//             }, duration)
+//         })
+//     }
+// }
+
+// export function debounce(callback, delay){
+//     var timer;
+//     return function() {
+//         var args = arguments;
+//         var context = this;
+//         clearTimeout(timer);
+//         timer = setTimeout(function(){
+//             callback.apply(context, args);
+//         }, delay)
+//     }
+// }
 
 /**
  * @param {number} duration 
