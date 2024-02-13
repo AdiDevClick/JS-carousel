@@ -13,15 +13,19 @@ export class Carousel
     #scrolling = false
     #status
     #hovered = false
+    #pending = false
     #currentTime = 0
     #currentItem = 0
     #element
     #prevButton
     #nextButton
     #items
+    #duration
     #endTime = 0
     #startTime = 0
     #reverseAnimation
+    // #items = []
+    #inAnimationList = []
     #observer
     #intersect
     #ratio = .6
@@ -30,6 +34,20 @@ export class Carousel
         rootMargin: '0px',
         threshold: this.#ratio
     }
+    // #intersectHandler = (entries) => {
+    //     entries.forEach(async entry => {
+    //         if (entry.intersectionRatio > this.#ratio) {
+    //             // console.log("le status apres intersect quand il n'est pas clicked: "+this.#status)
+    //             this.#intersect = true
+    //             // this.#scrolling = true
+    //             // this.#click = false
+    //             await this.#whileFalse()
+    //         } else {
+    //             // return
+    //             this.#observe(this.#element)
+    //         }
+    //     })
+    // }
     #intersectHandler = (entries) => {
         entries.forEach(entry => {
             if (entry.intersectionRatio > this.#ratio) {
@@ -52,6 +70,7 @@ export class Carousel
     #offset = 0
     #resolvedPromisesArray = []
     #eventAction
+    #activeButton = []
     #myIndex
     #reverseMode = false
 
@@ -100,13 +119,6 @@ export class Carousel
             this.container.append(item)
             return item
         })
-        // children.forEach(child => {
-        //     let item = createElement('div', {class: 'carousel__item'})
-        //         item.append(child)
-        //         this.container.append(item)
-        //         this.#items.push(item)
-        // })
-        
         if (this.options.infinite) {
             this.#offset = this.#slidesToScroll + this.#visibleSlides
             if (this.#offset > children.length) {
@@ -119,7 +131,6 @@ export class Carousel
             ]
             this.#goToItem(this.#offset, false)
         }
-        
         this.#items.forEach(item => this.container.append(item))
         this.setStyle()
         if (this.options.navigation) {
@@ -222,51 +233,30 @@ export class Carousel
      * @returns 
      */
     async #bubbleAnimation() {
-        // debugger
-        // console.log('quel status pour mon reverse : '+this.#reverseAnimation+' ca intersect : '+this.#intersect+' taille de larray : '+ +' Petit check dans le bubble :'+' status : '+this.#status , 'clicked : '+this.#click, 'pending : ' + this.#pending)
         if (!this.#reverseAnimation && this.#loadingBar) {
-        // if (!this.#reverseAnimation && !this.#scrolling && this.#loadingBar && this.#loadingBar.classList.value !== 'carousel__pagination__loadingBar carousel__pagination__loadingBar--fade') {
             try {
-                // console.log('object2')
-                // this.#click = false
                 this.#reverseAnimation = true
                 this.#status = 'inverseAnimation'
-                // this.#intersect = false
                 this.#loadingBar.classList.add('carousel__pagination__loadingBar--fade')
                 this.#loadingBar.style.animationDirection = 'reverse'
-                // this.#loadingBar.style.animationPlayState = 'paused'
-                // if (this.#scrolling) {
-                    // this.#resolvedPromisesArray.push(await waitAndFail(100, "je souhaite voir l'animation en reverse"))
-                // } else {
-                    this.#resolvedPromisesArray.push(await wait(2000, "je souhaite voir l'animation en reverse"))
-                // }
-
-                // this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration, "je souhaite voir l'animation en reverse"))
+                this.#resolvedPromisesArray.push(await wait(2000, "je souhaite voir l'animation en reverse"))
                 const r = await this.getStates
                 if (r.status === 'rejected') {
                     throw new Error(`Promesse ${r.reason} non tenable`, {cause: r.reason})
                 }
                 this.#loadingBar.style.display = 'none' 
                 this.#status = 'inverseComplete'
-                // console.log(this.#status)
-                // return this.#showLoadingBar()
-                // return this.#animate()
             } catch (error) {
                 null
-                // console.log(error + 'ca devrait etre r')
-                // this.#loadingBar.style.display = 'none'
-                // return this.#animate()
-                // return this.#whileFalse()
             }
         }
         return
     }
 
-    #disconnectObserver(message) {
-        this.#observer.disconnect
-        // this.#element.remove()
-        throw new Error(message)
-    }
+    // #disconnectObserver(message) {
+    //     this.#observer.disconnect
+    //     throw new Error(message)
+    // }
     
     /**
      * Passe un array de promesse définit
@@ -291,22 +281,12 @@ export class Carousel
                 (reason) => ({ status: "rejected", reason }),
         )
     }
-
-    // get prom() {
-    //     let r
-    //     this.#resolvedPromisesArray.forEach(element => {
-    //         r = element
-    //     })
-    //     return r
-    // }
-    
     /**
      * Fonction principale de l'auto-scrolling
      * @returns 
      */
     async #whileFalse() {
         if (this.#scrolling || !this.#intersect || this.#status === 'hovered') return
-        
         try {
             if ((this.#click || this.#status === 'clicked')) {
                 this.#resolvedPromisesArray.push(await waitAndFail(100, "j'ai clic"))
@@ -340,13 +320,10 @@ export class Carousel
     #onFulfilled(arrayLength) {
         if (!this.#click && this.#intersect && !this.#reverseAnimation) {
             this.#scrolling ? this.#scrolling = false : null
-
             if (arrayLength <= this.#resolvedPromisesArray.length && this.#reverseMode) this.#prev()
             if (arrayLength <= this.#resolvedPromisesArray.length && !this.#reverseMode) this.#next()
-
             this.#resolvedPromisesArray = []
             this.#status = 'completed'
-
             if (this.#status === 'completed') return this.#observe(this.#element)
         }
         this.#scrolling ? this.#scrolling = false : null
@@ -379,7 +356,6 @@ export class Carousel
         this.#prevButton = createElement('div', {
             class: 'carousel__prev'
         })
-
         this.root.append(this.#nextButton)
         this.root.append(this.#prevButton)
         this.#createEventListenerFromClick(this.#nextButton, 'click', 'next', true, this.#next.bind(this))
@@ -412,7 +388,6 @@ export class Carousel
      * Crer un timer
      */
     get startTime() {
-        this.#startTime = 0
         return this.#startTime = performance.now()
     }
 
@@ -420,7 +395,6 @@ export class Carousel
      * Crer un timer
      */
     get endTime() {
-        this.#endTime = 0
         return this.#endTime = performance.now()
     }
 
@@ -428,7 +402,6 @@ export class Carousel
      * Permet de vérifier le temps entre le hover et le début du timer
      */
     get currentTime() {
-        this.#currentTime = 0
         const time = this.#endTime - this.#startTime
         return this.#currentTime = this.#autoSlideDuration - time
     }
@@ -438,12 +411,11 @@ export class Carousel
      * @param {PointerEvent} e 
      */
     #onHover() {
-        if (this.#click || this.#status === 'hovered') return
-
+        if (this.#click) return
+        if (this.#status === 'hovered') return
         this.endTime
-        this.#resolvedPromisesArray = []
+        // this.#resolvedPromisesArray = []
         this.#status === 'canResume' ? null : this.#status = 'hovered'
-
         if (this.#loadingBar) this.#loadingBar.style.animationPlayState = 'paused'
     }
 
@@ -453,16 +425,16 @@ export class Carousel
      */
     #onPointerOut(e) {
         if (this.#click) return
-        
         if (this.#status === 'canResume') {
             this.#status = 'hoveredCompleted'
             this.#hovered = false
-            this.#resolvedPromisesArray = []
+            // this.currentTime
+            // this.#resolvedPromisesArray = []
             if (this.#status === 'hoveredCompleted') {
                 if (this.#loadingBar) {
                     this.currentTime
                     this.#loadingBar.style.animationPlayState = 'running'
-                    this.#observe(this.#element)
+                    return this.#observe(this.#element)
                 }
             }
         }
@@ -480,19 +452,15 @@ export class Carousel
      */
     #createEventListenerFromMouse(object, eventToListen , customEvent, animationDelay = false, funct = null, args = null) {
         object.addEventListener(eventToListen, (e) => {
-            
             if (funct && (this.#status !== 'hovered' && this.#status !== 'clicked')) funct(args)
-            
             this.#eventAction = e.clientX
             this.#resolvedPromisesArray = []
             this.#click ? this.#hovered = false : this.#hovered = true
-
             let newEvent = new CustomEvent(`${customEvent}`, {
                 bubbles: false,
                 detail: e
             }, {once: true})
             object.dispatchEvent(newEvent)
-
             animationDelay ? this.#getAnimationDelay : null
         })
     }
@@ -521,6 +489,7 @@ export class Carousel
             animationDelay ? this.#getAnimationDelay : null
         })
     }
+
     /**
      * Debounce le hover
      * @param {HTMLElement} object 
@@ -538,11 +507,12 @@ export class Carousel
             let X = mouseEvent.clientX
             let Y = mouseEvent.clientY
             let mousePosition = X
-
-            if (mousePosition !== this.#eventAction) return mousePosition = X
-
+            
+            if (mousePosition !== this.#eventAction) {
+                mousePosition = X
+                return
+            }
             this.#status === 'hovered' ? this.#status = 'canResume' : null
-
             return this.#onPointerOut()
         }, (this.#afterClickDelay)))
     }
@@ -568,14 +538,14 @@ export class Carousel
         }, (this.#afterClickDelay)))
     }
 
-    #cancelPromise() {
-        const actualPromise = new Promise((resolve, reject) => { setTimeout(resolve, 10000) });
-        let cancel;
-        const cancelPromise = new Promise((resolve, reject) => {
-        cancel = reject.bind(null, { canceled: true })
-        })
-        const cancelablePromise = Object.assign(Promise.race([actualPromise, cancelPromise]), { cancel });
-    }
+    // #cancelPromise() {
+    //     const actualPromise = new Promise((resolve, reject) => { setTimeout(resolve, 10000) });
+    //     let cancel;
+    //     const cancelPromise = new Promise((resolve, reject) => {
+    //     cancel = reject.bind(null, { canceled: true })
+    //     })
+    //     const cancelablePromise = Object.assign(Promise.race([actualPromise, cancelPromise]), { cancel });
+    // }
 
     /**
      * Permet de modifier la durée d'animation de la loadingBar
@@ -592,7 +562,9 @@ export class Carousel
      * @returns {@function | delayAnimation}
      */
     get #getAnimationDelay() {
-        if (!this.#click) return this.#delayAnimation(this.#autoSlideDuration)
+        if (!this.#click) {
+            return this.#delayAnimation(this.#autoSlideDuration)
+        } 
         return this.#delayAnimation(this.#afterClickDelay + this.#autoSlideDuration)
     }
 
@@ -685,7 +657,7 @@ export class Carousel
                 return this.#reverseMode = false
             }
         } else if ((index >= this.#items.length) || (this.#items[this.#currentItem + this.#visibleSlides] === undefined) && index > this.#currentItem) {
-            if (this.options.loop && !this.#reverseMode) {
+            if (this.options.loop) {
                 index = 0
             } else {
                 return

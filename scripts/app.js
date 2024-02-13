@@ -46,19 +46,22 @@ const onReady = function() {
         slidesToScroll: 2,
         visibleSlides: 3,
         loop: true,
+        pagination: true,
         automaticScrolling: false
     })
     new Carousel(document.querySelector('#carousel4'), {
         slidesToScroll: 3,
         visibleSlides: 4,
+        pagination: true,
         automaticScrolling: false,
-        loop: true
+        loop: false
     })
     new Carousel(document.querySelector('#carousel5'), {
         slidesToScroll: 1,
         visibleSlides: 1,
-        automaticScrolling: false,
-        loop: true,
+        pagination: true,
+        automaticScrolling: true,
+        loop: false,
     })
 }
 
