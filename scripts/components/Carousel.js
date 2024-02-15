@@ -1,4 +1,5 @@
 import { createElement, debounce, wait, waitAndFail } from "../functions/dom.js"
+import { CarouselTouchPlugin } from "./CarouselTouchPlugin.js"
 
 export class Carousel 
 {
@@ -14,11 +15,11 @@ export class Carousel
     #status
     #hovered = false
     #currentTime = 0
-    #currentItem = 0
-    #element
+    // currentItem = 0
+    // element
     #prevButton
     #nextButton
-    #items
+    // items
     #endTime = 0
     #startTime = 0
     #reverseAnimation
@@ -70,7 +71,7 @@ export class Carousel
      * @param {boolean} [options.afterClickDelay=10000] Permet de définir un délai après intéraction de l'utilisateur - par défaut : 10s
      */
     constructor(element, options = {}) {
-        this.#element = element
+        this.element = element
         this.options = Object.assign({}, {
             slidesToScroll: 1,
             visibleSlides: 1,
@@ -82,6 +83,7 @@ export class Carousel
             autoSlideDuration: 3000,
             afterClickDelay: 10000
         }, options)
+        this.currentItem = 0
 
         if (options.loop && options.infinite) {
             throw new Error(`Vous ne pouvez pas être à la fois en boucle ET en infini`)
@@ -93,8 +95,8 @@ export class Carousel
         this.container = createElement('div', {class: 'carousel__container'})
         this.root.setAttribute('tabindex', 0)
         this.root.append(this.container)
-        this.#element.append(this.root)
-        this.#items = children.map(child => {
+        this.element.append(this.root)
+        this.items = children.map(child => {
             const item = createElement('div', {class: 'carousel__item'})
             item.append(child)
             this.container.append(item)
@@ -104,7 +106,7 @@ export class Carousel
         //     let item = createElement('div', {class: 'carousel__item'})
         //         item.append(child)
         //         this.container.append(item)
-        //         this.#items.push(item)
+        //         this.items.push(item)
         // })
         
         if (this.options.infinite) {
@@ -112,15 +114,15 @@ export class Carousel
             if (this.#offset > children.length) {
                 console.error(`Vous n'avez pas assez d'éléments dans le carousel`, element);
             }
-            this.#items = [
-                ...this.#items.slice(this.#items.length - this.#offset).map(item => item.cloneNode(true)),
-                ...this.#items,
-                ...this.#items.slice(0, this.#offset).map(item => item.cloneNode(true))
+            this.items = [
+                ...this.items.slice(this.items.length - this.#offset).map(item => item.cloneNode(true)),
+                ...this.items,
+                ...this.items.slice(0, this.#offset).map(item => item.cloneNode(true))
             ]
-            this.#goToItem(this.#offset, false)
+            this.goToItem(this.#offset, false)
         }
         
-        this.#items.forEach(item => this.container.append(item))
+        this.items.forEach(item => this.container.append(item))
         this.setStyle()
         if (this.options.navigation) {
             this.#createNavigation()
@@ -129,9 +131,9 @@ export class Carousel
             this.#createPagination()
         }
         // Evènements
-        this.#moveCallbacks.forEach(cb => cb(this.#currentItem))
+        this.#moveCallbacks.forEach(cb => cb(this.currentItem))
         if (this.options.automaticScrolling) {
-            this.#observe(this.#element)
+            this.#observe(this.element)
         }
         this.#onWindowResize()
         window.addEventListener('resize', this.#onWindowResize.bind(this))
@@ -141,7 +143,7 @@ export class Carousel
         }
 
         if (this.options.automaticScrolling) {
-            this.#items.forEach(item => {
+            this.items.forEach(item => {
                 if (this.#click !== true || this.#status !== 'clicked') {
                     this.#createEventListenerFromMouse(item, 'mousemove' , 'mouseDebounce', false, this.#onHover.bind(this))
                     this.#debounceMouse(item, 'mouseDebounce')
@@ -150,6 +152,16 @@ export class Carousel
                 return
             })
         }
+
+        new CarouselTouchPlugin(this)
+    }
+
+    disableTransition() {
+        this.container.style.transition = 'none'
+    }
+
+    enableTransition() {
+        this.container.style.transition = ''
     }
 
     /**
@@ -158,10 +170,10 @@ export class Carousel
      */
     #accessibilityKeys(e) {
         if (e.key === 'Right' || e.key === 'ArrowRight') {
-            this.#next()
+            this.next()
         } 
         if (e.key === 'Left' || e.key === 'ArrowLeft') {
-            this.#prev()
+            this.prev()
         }
     }
 
@@ -169,9 +181,9 @@ export class Carousel
      * Applique les bonnes dimensions aux éléments du carousel
      */
     setStyle() {
-        let ratio = this.#items.length / this.#visibleSlides
+        let ratio = this.items.length / this.#visibleSlides
         this.container.style.width = (ratio * 100) + "%"
-        this.#items.forEach(item => {
+        this.items.forEach(item => {
             item.style.width = ((100 / this.#visibleSlides) / ratio) + "%"
         })
     }
@@ -264,7 +276,7 @@ export class Carousel
 
     #disconnectObserver(message) {
         this.#observer.disconnect
-        // this.#element.remove()
+        // this.element.remove()
         throw new Error(message)
     }
     
@@ -341,13 +353,13 @@ export class Carousel
         if (!this.#click && this.#intersect && !this.#reverseAnimation) {
             this.#scrolling ? this.#scrolling = false : null
 
-            if (arrayLength <= this.#resolvedPromisesArray.length && this.#reverseMode) this.#prev()
-            if (arrayLength <= this.#resolvedPromisesArray.length && !this.#reverseMode) this.#next()
+            if (arrayLength <= this.#resolvedPromisesArray.length && this.#reverseMode) this.prev()
+            if (arrayLength <= this.#resolvedPromisesArray.length && !this.#reverseMode) this.next()
 
             this.#resolvedPromisesArray = []
             this.#status = 'completed'
 
-            if (this.#status === 'completed') return this.#observe(this.#element)
+            if (this.#status === 'completed') return this.#observe(this.element)
         }
         this.#scrolling ? this.#scrolling = false : null
         return
@@ -364,7 +376,7 @@ export class Carousel
             this.#click = false
             this.#scrolling ? this.#scrolling = false : null
             this.#status = 'clickComplete'
-            if (this.#status === 'clickComplete') return this.#observe(this.#element)
+            if (this.#status === 'clickComplete') return this.#observe(this.element)
         }
         return
     }
@@ -382,8 +394,8 @@ export class Carousel
 
         this.root.append(this.#nextButton)
         this.root.append(this.#prevButton)
-        this.#createEventListenerFromClick(this.#nextButton, 'click', 'next', true, this.#next.bind(this))
-        this.#createEventListenerFromClick(this.#prevButton, 'click', 'prev', true, this.#prev.bind(this))
+        this.#createEventListenerFromClick(this.#nextButton, 'click', 'next', true, this.next.bind(this))
+        this.#createEventListenerFromClick(this.#prevButton, 'click', 'prev', true, this.prev.bind(this))
         this.#debounce(this.#nextButton, 'next')
         this.#debounce(this.#prevButton, 'prev')
 
@@ -397,7 +409,7 @@ export class Carousel
                 this.#prevButton.disabled = false
             }
 
-            if (this.#items[this.#currentItem + this.#visibleSlides] === undefined) {
+            if (this.items[this.currentItem + this.#visibleSlides] === undefined) {
                 this.#nextButton.classList.add('carousel__next--hidden')
                 this.#nextButton.disabled = true
                 this.#reverseMode = true
@@ -462,7 +474,7 @@ export class Carousel
                 if (this.#loadingBar) {
                     this.currentTime
                     this.#loadingBar.style.animationPlayState = 'running'
-                    this.#observe(this.#element)
+                    this.#observe(this.element)
                 }
             }
         }
@@ -562,7 +574,7 @@ export class Carousel
                     return
                 } else {
                     this.#scrolling = false
-                    return this.#observe(this.#element)
+                    return this.#observe(this.element)
                 }
             }
         }, (this.#afterClickDelay)))
@@ -602,7 +614,7 @@ export class Carousel
      */
     #paginate(i) {
         this.#paginationButton = createElement('div', {class: 'carousel__pagination__button'})
-            this.#createEventListenerFromClick(this.#paginationButton, 'click', 'paginationButton', true, this.#goToItem.bind(this), i + this.#offset)
+            this.#createEventListenerFromClick(this.#paginationButton, 'click', 'paginationButton', true, this.goToItem.bind(this), i + this.#offset)
             this.pagination.append(this.#paginationButton)
             this.buttons.push(this.#paginationButton)
             this.#debounce(this.#paginationButton, 'paginationButton')
@@ -619,18 +631,18 @@ export class Carousel
         this.buttons = []
         this.root.append(this.pagination)
         if (!this.options.infinite) {
-            for (let i = 0; i < this.#items.length / this.#visibleSlides; i++) {
+            for (let i = 0; i < this.items.length / this.#visibleSlides; i++) {
                 this.#paginate(i)
             }
         } else {
-            for (let i = 0; i < this.#items.length - 2 * this.#offset; i = i + this.#slidesToScroll) {
+            for (let i = 0; i < this.items.length - 2 * this.#offset; i = i + this.#slidesToScroll) {
                 this.#paginate(i)
             }
         }
         this.buttons.push(this.#paginationButton)
         let activeButton
         this.#onMove(index => {
-            let count = this.#items.length - 2 * this.#offset
+            let count = this.items.length - 2 * this.#offset
             
             if (this.options.infinite) {
                 activeButton = this.buttons[Math.floor(((index + this.#slidesToScroll - this.#offset) % count) / this.#slidesToScroll) ]
@@ -652,12 +664,12 @@ export class Carousel
         })
     }
 
-    #next() {
-        this.#goToItem(this.#currentItem + this.#slidesToScroll)
+    next() {
+        this.goToItem(this.currentItem + this.#slidesToScroll)
     }
 
-    #prev() {
-        this.#goToItem(this.#currentItem - this.#slidesToScroll)
+    prev() {
+        this.goToItem(this.currentItem - this.#slidesToScroll)
     }
 
     /**
@@ -665,44 +677,44 @@ export class Carousel
      * @param {number} index 
      * @param {boolean} [animation = true]
      */
-    #goToItem(index, animation = true) {
+    goToItem(index, animation = true) {
         if (index < 0) {
-            let ratio = Math.floor(this.#items.length / this.#slidesToScroll)
-            let modulo = this.#items.length % this.#slidesToScroll
+            let ratio = Math.floor(this.items.length / this.#slidesToScroll)
+            let modulo = this.items.length % this.#slidesToScroll
             if (this.options.loop) {
                 if (ratio - modulo === this.#slidesToScroll && modulo !== 0) {
-                    index = this.#items.length - this.#visibleSlides
+                    index = this.items.length - this.#visibleSlides
                     this.#myIndex = 1
                 } else if (ratio + modulo === this.#visibleSlides && ratio === this.#slidesToScroll) {
-                    index = this.#items.length - this.#visibleSlides
+                    index = this.items.length - this.#visibleSlides
                     this.#myIndex = 2
                 } else {
-                    for (let i = 0; i < this.#items.length; i = i + this.#slidesToScroll) {
+                    for (let i = 0; i < this.items.length; i = i + this.#slidesToScroll) {
                         index = i
                     }
                 }
             } else {
                 return this.#reverseMode = false
             }
-        } else if ((index >= this.#items.length) || (this.#items[this.#currentItem + this.#visibleSlides] === undefined) && index > this.#currentItem) {
+        } else if ((index >= this.items.length) || (this.items[this.currentItem + this.#visibleSlides] === undefined) && index > this.currentItem) {
             if (this.options.loop && !this.#reverseMode) {
                 index = 0
             } else {
                 return
             }
         }
-        let translateX = index * (-100 / this.#items.length)
+        let translateX = index * (-100 / this.items.length)
         if (!animation) {
-            this.container.style.transition = 'none'
+            this.disableTransition()
         }
-        this.container.style.transform = 'translate3d('+ translateX + '%,  0, 0)'
+        this.translate(translateX)
         // Force Repaint
         this.container.offsetHeight
         // End of Force Repaint
         if (!animation) {
-            this.container.style.transition = ''
+            this.enableTransition()
         }
-        this.#currentItem = index
+        this.currentItem = index
         this.#moveCallbacks.forEach(cb => cb(index))
     }
 
@@ -710,12 +722,12 @@ export class Carousel
      * Déplace le container pour donner l'impression d'un slide infini
      */
     #resetInfinite() {
-        if (this.#currentItem <= this.#slidesToScroll) {
-            this.#goToItem(this.#currentItem + (this.#items.length - 2 * this.#offset), false)
+        if (this.currentItem <= this.#slidesToScroll) {
+            this.goToItem(this.currentItem + (this.items.length - 2 * this.#offset), false)
             return
         } 
-        if (this.#currentItem >= this.#items.length - this.#offset) {
-            this.#goToItem(this.#currentItem - (this.#items.length - 2 * this.#offset), false)
+        if (this.currentItem >= this.items.length - this.#offset) {
+            this.goToItem(this.currentItem - (this.items.length - 2 * this.#offset), false)
             return
         }
         return
@@ -735,8 +747,12 @@ export class Carousel
         if (mobile !== this.#isMobile) {
             this.#isMobile = mobile
             this.setStyle()
-            this.#moveCallbacks.forEach(cb => cb(this.#currentItem))
+            this.#moveCallbacks.forEach(cb => cb(this.currentItem))
         } 
+    }
+
+    translate(percent) {
+        this.container.style.transform = 'translate3d('+ percent + '%,  0, 0)'
     }
 
     /** @returns {number} */
@@ -757,5 +773,15 @@ export class Carousel
     /** @returns {@param | options.afterClickDelay} */
     get #afterClickDelay() {
         return this.options.afterClickDelay
+    }
+
+    /** @returns {number} */
+    get containerWidth() {
+        return this.container.offsetWidth
+    }
+
+    /** @returns {number} */
+    get carouselWidth() {
+        return this.root.offsetWidth
     }
 }
