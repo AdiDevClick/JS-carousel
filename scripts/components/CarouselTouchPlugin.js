@@ -1,3 +1,4 @@
+import { debounce, debounce2, debounce3, wait } from "../functions/dom.js"
 import { Carousel } from "./Carousel.js"
 
 /**
@@ -9,15 +10,16 @@ export class CarouselTouchPlugin {
      * @param {Carousel} carousel 
      */
     constructor(carousel) {
+        this.carousel = carousel
         carousel.container.addEventListener('dragstart', e => e.preventDefault())
         carousel.container.addEventListener('mousedown', this.startDrag.bind(this), {passive: false, cancelable: true})
         carousel.container.addEventListener('touchstart', this.startDrag.bind(this), {passive: false, cancelable: true})
         window.addEventListener('mousemove', this.drag.bind(this), {passive: false, cancelable: true})
         window.addEventListener('touchmove', this.drag.bind(this), {passive: false, cancelable: true})
+        // window.addEventListener('touchend', debounce(() => {this.endDrag.bind(this)}, 5000), {passive: false, cancelable: true})
         window.addEventListener('touchend', this.endDrag.bind(this), {passive: false, cancelable: true})
         window.addEventListener('mouseup', this.endDrag.bind(this), {passive: false, cancelable: true})
         window.addEventListener('touchcancel', this.endDrag.bind(this), {passive: false, cancelable: true})
-        this.carousel = carousel
     }
 
     /**
@@ -35,6 +37,7 @@ export class CarouselTouchPlugin {
         this.origin = {x: e.screenX, y: e.screenY}
         this.carousel.disableTransition()
         this.width = this.carousel.containerWidth
+        this.carousel.activeClickStatus()
     }
 
     /**
@@ -59,7 +62,7 @@ export class CarouselTouchPlugin {
      * Fin du déplacement
      * @param {MouseEvent|TouchEvent} e 
      */
-    endDrag(e) {
+    async endDrag(e) {
         if (this.origin && this.lastTranslate) {
             this.carousel.enableTransition()
             if (Math.abs(this.lastTranslate.x / this.carousel.carouselWidth) > 0.2) {
@@ -68,6 +71,17 @@ export class CarouselTouchPlugin {
                 this.carousel.goToItem(this.carousel.currentItem)
             }
         }
+        // debounce(() => {this.carousel.onReject()}, this.carousel.options.afterClickDelay)
+        // await wait(this.carousel.options.afterClickDelay)
+        // document.addEventListener('touchend', debounce( (e) => {
+        //     this.carousel.onReject()
+        //     console.log('test2')
+        // }, (5000)))
+        const test = debounce(this.carousel.onReject, 10000)
+        test()
+        console.log('test')
+        // this.carousel.onReject()
+        // this.carousel.deactivateClickStatus()
         this.origin = null
     }
 }

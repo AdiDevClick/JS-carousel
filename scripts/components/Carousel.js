@@ -207,12 +207,34 @@ export class Carousel
             this.#observer.unobserve(elements)
             this.#observer.disconnect()
             this.#intersect = false
+            // this.resetStatus()
         }
         if (this.options.automaticScrolling) {
             this.#observer = new IntersectionObserver(this.#intersectHandler, this.#options)
             this.#observer.observe(elements)
         }
         return
+    }
+
+    resetStatus() {
+        this.#click = false
+        this.#scrolling = false
+    }
+
+    activeClickStatus() {
+        this.#status = 'clicked'
+        this.#resolvedPromisesArray = []
+        this.#scrolling = true
+        this.#click = true
+    }
+
+    deactivateClickStatus() {
+        console.log('petit test')
+        this.#resolvedPromisesArray = []
+        this.#click = false
+        this.#scrolling ? this.#scrolling = false : null
+        this.#status = 'clickComplete'
+        // if (this.#status === 'clickComplete') return this.#observe(this.element)
     }
 
     /**
@@ -340,7 +362,7 @@ export class Carousel
             }
             return
         } catch (error) {
-            this.#onReject()
+            this.onReject()
         }
     }
     
@@ -370,14 +392,13 @@ export class Carousel
      * Il reviendra à la fonction 
      * @returns 
      */
-    #onReject() {
+    onReject() {
         if (this.#click) {
-            this.#resolvedPromisesArray = []
-            this.#click = false
-            this.#scrolling ? this.#scrolling = false : null
-            this.#status = 'clickComplete'
+            console.log('object')
+            this.deactivateClickStatus()
             if (this.#status === 'clickComplete') return this.#observe(this.element)
         }
+    // console.log('test 3')
         return
     }
     
@@ -396,8 +417,8 @@ export class Carousel
         this.root.append(this.#prevButton)
         this.#createEventListenerFromClick(this.#nextButton, 'click', 'next', true, this.next.bind(this))
         this.#createEventListenerFromClick(this.#prevButton, 'click', 'prev', true, this.prev.bind(this))
-        this.#debounce(this.#nextButton, 'next')
-        this.#debounce(this.#prevButton, 'prev')
+        this.debounce(this.#nextButton, 'next')
+        this.debounce(this.#prevButton, 'prev')
 
         if (this.options.loop === true || this.options.infinite === true) return
         this.#onMove(index => {
@@ -521,10 +542,7 @@ export class Carousel
     #createEventListenerFromClick(object, eventToListen , customEvent, animationDelay = false, funct, args) {
         object.addEventListener(eventToListen, (e) => {
             funct(args)
-            this.#status = 'clicked'
-            this.#resolvedPromisesArray = []
-            this.#scrolling = true
-            this.#click = true
+            this.activeClickStatus()
             let newEvent = new CustomEvent(`${customEvent}`, {
                 bubbles: false,
                 detail: this.e
@@ -565,7 +583,7 @@ export class Carousel
      * @param {AddEventListenerOptions} event 
      * @fires [debounce] <this.#afterClickDelay>
      */
-    #debounce(object, event) {
+    debounce(object, event) {
         object.addEventListener(event, debounce( () => {
             let array = this.#resolvedPromisesArray.length
             if (this.#status === 'clicked' || this.#click && this.#intersect) {
@@ -617,7 +635,7 @@ export class Carousel
             this.#createEventListenerFromClick(this.#paginationButton, 'click', 'paginationButton', true, this.goToItem.bind(this), i + this.#offset)
             this.pagination.append(this.#paginationButton)
             this.buttons.push(this.#paginationButton)
-            this.#debounce(this.#paginationButton, 'paginationButton')
+            this.debounce(this.#paginationButton, 'paginationButton')
     }
 
     /**
@@ -783,5 +801,9 @@ export class Carousel
     /** @returns {number} */
     get carouselWidth() {
         return this.root.offsetWidth
+    }
+
+    get onReject2() {
+        this.onReject()
     }
 }
