@@ -21,7 +21,6 @@ export function createElement(tagName, attributes = {}) {
 export const debounce = function(funct, duration) {
     let timer
     return (...args) => {
-        // let args = arguments
         let context = this
         return new Promise((resolve) => {
             clearTimeout(timer)
@@ -32,48 +31,6 @@ export const debounce = function(funct, duration) {
         })
     }
 }
-export const debounce2 = function(funct, duration) {
-    let timer
-    return function() {
-        let args = arguments
-        let context = this
-        return new Promise((resolve) => {
-            clearTimeout(timer)
-            timer = setTimeout(() => {
-                funct.apply(context, args)
-                resolve(duration)
-            }, duration)
-        })
-    }
-}
-
-export const debounce3 = (mainFunction, delay) => {
-    // Declare a variable called 'timer' to store the timer ID
-    let timer;
-  
-    // Return an anonymous function that takes in any number of arguments
-    return function (...args) {
-      // Clear the previous timer to prevent the execution of 'mainFunction'
-      clearTimeout(timer);
-  
-      // Set a new timer that will execute 'mainFunction' after the specified delay
-      timer = setTimeout(() => {
-        mainFunction(...args);
-      }, delay);
-    };
-  };
-
-// export function debounce2(callback, delay){
-//     var timer;
-//     return function() {
-//         var args = arguments;
-//         var context = this;
-//         clearTimeout(timer);
-//         timer = setTimeout(function(){
-//             callback.apply(context, args);
-//         }, delay)
-//     }
-// }
 
 /**
  * @param {number} duration 

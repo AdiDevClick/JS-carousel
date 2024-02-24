@@ -44,7 +44,7 @@ export class CarouselTouchPlugin {
         this.origin = {x: e.screenX, y: e.screenY}
         this.carousel.disableTransition()
         this.width = this.carousel.containerWidth
-        this.carousel.activeClickStatus()
+        this.carousel.activateClickStatus()
     }
 
     /**
