@@ -10,13 +10,20 @@ export class CarouselTouchPlugin {
      */
     constructor(carousel) {
         carousel.container.addEventListener('dragstart', e => e.preventDefault())
-        carousel.container.addEventListener('mousedown', this.startDrag.bind(this), {passive: false, cancelable: true})
-        carousel.container.addEventListener('touchstart', this.startDrag.bind(this), {passive: false, cancelable: true})
-        window.addEventListener('mousemove', this.drag.bind(this), {passive: false, cancelable: true})
-        window.addEventListener('touchmove', this.drag.bind(this), {passive: false, cancelable: true})
-        window.addEventListener('touchend', this.endDrag.bind(this), {passive: false, cancelable: true})
-        window.addEventListener('mouseup', this.endDrag.bind(this), {passive: false, cancelable: true})
-        window.addEventListener('touchcancel', this.endDrag.bind(this), {passive: false, cancelable: true})
+        
+        carousel.container.addEventListener('mousedown', this.startDrag.bind(this), {passive: false})
+        carousel.container.addEventListener('touchstart', this.startDrag.bind(this))
+        
+        window.addEventListener('mousemove', this.drag.bind(this))
+        window.addEventListener('touchmove', this.drag.bind(this), {passive: false})
+        
+        window.addEventListener('touchend', this.endDrag.bind(this))
+        window.addEventListener('mouseup', this.endDrag.bind(this))
+        window.addEventListener('touchcancel', this.endDrag.bind(this))
+        
+        carousel.debounce(carousel.container, 'touchend')
+        carousel.debounce(carousel.container, 'mouseup')
+
         this.carousel = carousel
     }
 
@@ -32,6 +39,7 @@ export class CarouselTouchPlugin {
                 e = e.touches[0]
             }
         }
+        this.carousel.activateClickStatus()
         this.origin = {x: e.screenX, y: e.screenY}
         this.carousel.disableTransition()
         this.width = this.carousel.containerWidth
@@ -46,7 +54,7 @@ export class CarouselTouchPlugin {
             const pressionPoint = e.touches ? e.touches[0] : e
             const translate = {x: pressionPoint.screenX - this.origin.x, y: pressionPoint.screenY - this.origin.y}
             if (e.touches && Math.abs(translate.x) > Math.abs(translate.y)) {
-                e.preventDefault()
+                if (e.cancelable) e.preventDefault()
                 e.stopPropagation()
             }
             const baseTranslate = this.carousel.currentItem * -100 / this.carousel.items.length
