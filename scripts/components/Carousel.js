@@ -325,7 +325,7 @@ export class Carousel
             }
             return
         } catch (error) {
-            this.#onReject()
+            this.onReject()
         }
     }
     
@@ -355,14 +355,13 @@ export class Carousel
      * Il reviendra à la fonction 
      * @returns 
      */
-    #onReject() {
+    onReject() {
         if (this.#click) {
-            this.#resolvedPromisesArray = []
-            this.#click = false
-            this.#scrolling ? this.#scrolling = false : null
-            this.#status = 'clickComplete'
+            console.log('object')
+            this.deactivateClickStatus()
             if (this.#status === 'clickComplete') return this.#observe(this.element)
         }
+    // console.log('test 3')
         return
     }
     
@@ -548,6 +547,7 @@ export class Carousel
      * @fires [debounce] <this.#afterClickDelay>
      */
     debounce(object, event) {
+    debounce(object, event) {
         object.addEventListener(event, debounce( () => {
             let array = this.#resolvedPromisesArray.length
             if (this.#status === 'clicked' || this.#click && this.#intersect) {
@@ -599,6 +599,7 @@ export class Carousel
             this.#createEventListenerFromClick(this.#paginationButton, 'click', 'paginationButton', true, this.goToItem.bind(this), i + this.#offset)
             this.pagination.append(this.#paginationButton)
             this.buttons.push(this.#paginationButton)
+            this.debounce(this.#paginationButton, 'paginationButton')
             this.debounce(this.#paginationButton, 'paginationButton')
     }
 
@@ -765,5 +766,9 @@ export class Carousel
     /** @returns {number} */
     get carouselWidth() {
         return this.root.offsetWidth
+    }
+
+    get onReject2() {
+        this.onReject()
     }
 }

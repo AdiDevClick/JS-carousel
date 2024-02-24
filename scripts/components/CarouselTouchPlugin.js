@@ -9,6 +9,7 @@ export class CarouselTouchPlugin {
      * @param {Carousel} carousel 
      */
     constructor(carousel) {
+        this.carousel = carousel
         carousel.container.addEventListener('dragstart', e => e.preventDefault())
         
         carousel.container.addEventListener('mousedown', this.startDrag.bind(this), {passive: false})
@@ -43,6 +44,7 @@ export class CarouselTouchPlugin {
         this.origin = {x: e.screenX, y: e.screenY}
         this.carousel.disableTransition()
         this.width = this.carousel.containerWidth
+        this.carousel.activeClickStatus()
     }
 
     /**
@@ -67,7 +69,7 @@ export class CarouselTouchPlugin {
      * Fin du déplacement
      * @param {MouseEvent|TouchEvent} e 
      */
-    endDrag(e) {
+    async endDrag(e) {
         if (this.origin && this.lastTranslate) {
             this.carousel.enableTransition()
             if (Math.abs(this.lastTranslate.x / this.carousel.carouselWidth) > 0.2) {
