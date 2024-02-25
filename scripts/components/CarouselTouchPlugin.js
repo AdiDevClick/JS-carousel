@@ -78,6 +78,7 @@ export class CarouselTouchPlugin {
                 this.carousel.goToItem(this.carousel.currentItem)
             }
         }
+        this.carousel.enableTransition()
         this.origin = null
     }
 }

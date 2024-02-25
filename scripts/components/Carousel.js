@@ -562,14 +562,14 @@ export class Carousel
         }, (this.#afterClickDelay)))
     }
 
-    #cancelPromise() {
-        const actualPromise = new Promise((resolve, reject) => { setTimeout(resolve, 10000) });
-        let cancel;
-        const cancelPromise = new Promise((resolve, reject) => {
-        cancel = reject.bind(null, { canceled: true })
-        })
-        const cancelablePromise = Object.assign(Promise.race([actualPromise, cancelPromise]), { cancel });
-    }
+    // #cancelPromise() {
+    //     const actualPromise = new Promise((resolve, reject) => { setTimeout(resolve, 10000) });
+    //     let cancel;
+    //     const cancelPromise = new Promise((resolve, reject) => {
+    //     cancel = reject.bind(null, { canceled: true })
+    //     })
+    //     const cancelablePromise = Object.assign(Promise.race([actualPromise, cancelPromise]), { cancel });
+    // }
 
     /**
      * Permet de modifier la durée d'animation de la loadingBar
@@ -627,9 +627,9 @@ export class Carousel
             let count = this.items.length - 2 * this.#offset
             
             if (this.options.infinite) {
-                activeButton = this.buttons[Math.floor(((index + this.#slidesToScroll - this.#offset) % count) / this.#slidesToScroll) ]
+                activeButton = this.buttons[Math.floor((index % count) / this.#slidesToScroll) ]
             } else {
-                activeButton = this.buttons[Math.floor(index / this.#slidesToScroll)]
+                activeButton = this.buttons[Math.round(index / this.#slidesToScroll)]
             }
 
             if (activeButton) {
@@ -664,12 +664,22 @@ export class Carousel
             let ratio = Math.floor(this.items.length / this.#slidesToScroll)
             let modulo = this.items.length % this.#slidesToScroll
             if (this.options.loop) {
+                
+                if (index + this.#slidesToScroll !== 0) {
+                    index = 0
+                }
                 if (ratio - modulo === this.#slidesToScroll && modulo !== 0) {
                     index = this.items.length - this.#visibleSlides
                     this.#myIndex = 1
                 } else if (ratio + modulo === this.#visibleSlides && ratio === this.#slidesToScroll) {
                     index = this.items.length - this.#visibleSlides
                     this.#myIndex = 2
+                } else if (ratio - modulo !== this.#slidesToScroll) {
+                    if (index + this.#slidesToScroll !== 0) {
+                        index = 0
+                    } else {
+                        index = this.items.length - this.#visibleSlides
+                    }
                 } else {
                     for (let i = 0; i < this.items.length; i = i + this.#slidesToScroll) {
                         index = i
@@ -684,6 +694,9 @@ export class Carousel
             } else {
                 return
             }
+        } else if (index + this.#slidesToScroll > this.items.length) {
+            console.log('object')
+            index = this.items.length - this.#visibleSlides
         }
         let translateX = index * (-100 / this.items.length)
         if (!animation) {
