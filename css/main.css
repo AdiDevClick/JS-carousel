@@ -83,6 +83,15 @@ body {
     /* width: 20%;  */
 }
 
+.item_container:hover:has(iframe) {
+    iframe {
+        display: block;
+    }
+    img {
+        display: none;
+    }
+}
+
 .item_container img{
     display: block;
     /* z-index: 0; */
@@ -90,9 +99,31 @@ body {
     position: relative; */
     /* overflow: auto; */
     width: 100%;
+    height: 100%;
     /* object-fit: contain; */
     /* background-size: contain; */
     /* max-width: 100%; */
+    aspect-ratio: 16 / 9;
+}
+
+/* .item__image {
+        position:block;
+        border: none;
+        text-decoration: none;
+        overflow: none;
+        width: 100%;
+        object-fit: contain;
+        background-size: contain;
+        aspect-ratio: 16 / 9;
+} */
+
+.item_container iframe {
+    display: none;
+    border: none;
+    overflow: none;
+    width: 100%;
+    object-fit: contain;
+    background-size: contain;
     aspect-ratio: 16 / 9;
 }
 

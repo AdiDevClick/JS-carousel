@@ -148,6 +148,7 @@ export class Carousel
                 }
                 return
             })
+            // new CarouselVideoPlugin(this)
         }
 
         new CarouselTouchPlugin(this)
@@ -303,6 +304,7 @@ export class Carousel
      */
     async #whileFalse() {
         if (this.#scrolling || !this.#intersect || this.#status === 'hovered') return
+        // if (this.#scrolling || !this.#intersect || this.#status === 'hovered' || this.#hovered) return
         
         try {
             if ((this.#click || this.#status === 'clicked')) {
@@ -515,6 +517,7 @@ export class Carousel
             animationDelay ? this.#getAnimationDelay : null
         })
     }
+    
     /**
      * Debounce le hover
      * @param {HTMLElement} object 
@@ -523,6 +526,7 @@ export class Carousel
      */
     #debounceMouse(object, event) {
         object.addEventListener(event, debounce((e) => {
+            const video = this.container.querySelector('iframe')
             if (this.#click || this.#status === 'clickComplete')  {
                 if (this.#loadingBar) this.#loadingBar.style.animationPlayState = 'running'
                 this.#scrolling = false
@@ -535,9 +539,21 @@ export class Carousel
 
             if (mousePosition !== this.#eventAction) return mousePosition = X
 
+            // if (video) {
+            //     console.log('jai un iframe')
+            //     return
+            // } else {
+            //     console.log('test')
+            //     this.#status === 'hovered' ? this.#status = 'canResume' : null
+            //     return this.#onPointerOut()
+            // }
             this.#status === 'hovered' ? this.#status = 'canResume' : null
-
             return this.#onPointerOut()
+            // if (video) {
+            //     return
+            // } else {
+            //     return this.#onPointerOut()
+            // }
         }, (this.#afterClickDelay)))
     }
 
@@ -695,7 +711,6 @@ export class Carousel
                 return
             }
         } else if (index + this.#slidesToScroll > this.items.length) {
-            console.log('object')
             index = this.items.length - this.#visibleSlides
         }
         let translateX = index * (-100 / this.items.length)

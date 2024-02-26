@@ -1,7 +1,7 @@
 import { Carousel } from "./Carousel.js"
 
 /**
- * Permet de rajouter la navigation tactile pour le carousel
+ * Permet de rajouter les vidéos en hoover
  */
 export class CarouselTouchPlugin {
 
@@ -9,7 +9,7 @@ export class CarouselTouchPlugin {
      * @param {Carousel} carousel 
      */
     constructor(carousel) {
-        this.carousel = carousel
+        // this.carousel = carousel
         carousel.container.addEventListener('dragstart', e => e.preventDefault())
         
         carousel.container.addEventListener('mousedown', this.startDrag.bind(this), {passive: false})
@@ -44,7 +44,7 @@ export class CarouselTouchPlugin {
         this.origin = {x: e.screenX, y: e.screenY}
         this.carousel.disableTransition()
         this.width = this.carousel.containerWidth
-        this.carousel.activateClickStatus()
+        // this.carousel.activateClickStatus()
     }
 
     /**
