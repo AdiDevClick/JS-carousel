@@ -1,5 +1,6 @@
 import { createElement, debounce, wait, waitAndFail } from "../functions/dom.js"
 import { CarouselTouchPlugin } from "./CarouselTouchPlugin.js"
+import { CarouselVideoPlugin } from "./CarouselVideoPlugin.js"
 
 export class Carousel 
 {
@@ -88,6 +89,7 @@ export class Carousel
         let children = [].slice.call(element.children)
 
         // Modification du DOM
+        this.#iFrameCreation()
         this.root = createElement('div', {class: 'carousel'})
         this.container = createElement('div', {class: 'carousel__container'})
         this.root.setAttribute('tabindex', 0)
@@ -95,6 +97,7 @@ export class Carousel
         this.element.append(this.root)
         this.items = children.map(child => {
             const item = createElement('div', {class: 'carousel__item'})
+            // this.#iFrameCreation()
             item.append(child)
             this.container.append(item)
             return item
@@ -130,7 +133,7 @@ export class Carousel
         // Evènements
         this.#moveCallbacks.forEach(cb => cb(this.currentItem))
         if (this.options.automaticScrolling) {
-            this.#observe(this.element)
+            this.observe(this.element)
         }
         this.#onWindowResize()
         window.addEventListener('resize', this.#onWindowResize.bind(this))
@@ -140,18 +143,31 @@ export class Carousel
         }
 
         if (this.options.automaticScrolling) {
-            this.items.forEach(item => {
-                if (this.#click !== true || this.#status !== 'clicked') {
-                    this.#createEventListenerFromMouse(item, 'mousemove' , 'mouseDebounce', false, this.#onHover.bind(this))
-                    this.#debounceMouse(item, 'mouseDebounce')
-                    item.addEventListener('mouseout', e => this.#onPointerOut(e))
-                }
-                return
-            })
-            // new CarouselVideoPlugin(this)
+            // this.items.forEach(item => {
+            //     if (this.#click !== true || this.#status !== 'clicked') {
+            //         this.#createEventListenerFromMouse(item, 'mousemove' , 'mouseDebounce', false, this.#onHover.bind(this))
+            //         this.#debounceMouse(item, 'mouseDebounce')
+            //         item.addEventListener('mouseout', e => this.#onPointerOut(e))
+            //     }
+            //     return
+            // })
+            new CarouselVideoPlugin(this)
         }
 
         new CarouselTouchPlugin(this)
+    }
+
+    #iFrameCreation() {
+        const iframe = document.getElementById('videoIFrame')
+
+        if (!iframe) {  
+            const tag = document.createElement('script')
+            tag.setAttribute('id', 'videoIFrame')
+            tag.src = "https://www.youtube.com/iframe_api"
+            
+            const firstScriptTag = document.getElementsByTagName('script')[0]
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+        }        
     }
 
     disableTransition() {
@@ -207,7 +223,7 @@ export class Carousel
     /**
      * @param {NodeListOf.<HTMLElement>} elements 
      */
-    #observe(elements) {
+    observe(elements) {
         if (this.#observer) {
             this.#observer.unobserve(elements)
             this.#observer.disconnect()
@@ -303,26 +319,32 @@ export class Carousel
      * @returns 
      */
     async #whileFalse() {
-        if (this.#scrolling || !this.#intersect || this.#status === 'hovered') return
+        if (this.getScrollingStatus || !this.#intersect || this.#status === 'hovered') return
         // if (this.#scrolling || !this.#intersect || this.#status === 'hovered' || this.#hovered) return
         
         try {
-            if ((this.#click || this.#status === 'clicked')) {
+            // console.log(`click status : ${this.#click}, hover status : ${this.#hovered}, global status : ${this.#status}`)
+            if ((this.getClickStatus || this.#status === 'clicked')) {
                 this.#resolvedPromisesArray.push(await waitAndFail(100, "j'ai clic"))
                 array = this.#resolvedPromisesArray.length 
-            } else if (this.#status !== 'hoveredCompleted' && !this.#click){
+                // console.log('je demandé un clicked')
+            } else if (this.#status !== 'hoveredCompleted' && !this.#click && !this.#hovered){
                 this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration, "J'ai demandé un slide normal"))
+                // console.log('jai demande un slide normal')
             } else {
                 this.#resolvedPromisesArray = []
+                
                 this.#resolvedPromisesArray.push(await wait(this.#currentTime, "J'ai demandé un slide après un hover"))
+                // console.log(this.#currentTime)
+                // console.log('jai demander un slide apres hover')
             }
             let array = this.#resolvedPromisesArray.length
             const r = await this.getStates
             if (r.status === 'rejected') {
                     throw new Error(`Promesse ${r.reason} non tenable`, {cause: r.reason})
                 }
-            if (!this.#click || this.#status === 'hoveredCompleted' || this.#status === 'canResume') {
-                this.#scrolling = true
+            if (!this.getClickStatus || this.#status === 'hoveredCompleted' || this.#status === 'canResume') {
+                this.setScrollingStatus = true
                 this.#onFulfilled(array)
             }
             return
@@ -330,6 +352,34 @@ export class Carousel
             this.#onReject()
         }
     }
+    // async #whileFalse() {
+    //     if (this.#scrolling || !this.#intersect || this.#status === 'hovered') return
+    //     // if (this.#scrolling || !this.#intersect || this.#status === 'hovered' || this.#hovered) return
+        
+    //     try {
+    //         if ((this.#click || this.#status === 'clicked')) {
+    //             this.#resolvedPromisesArray.push(await waitAndFail(100, "j'ai clic"))
+    //             array = this.#resolvedPromisesArray.length 
+    //         } else if (this.#status !== 'hoveredCompleted' && !this.#click){
+    //             this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration, "J'ai demandé un slide normal"))
+    //         } else {
+    //             this.#resolvedPromisesArray = []
+    //             this.#resolvedPromisesArray.push(await wait(this.#currentTime, "J'ai demandé un slide après un hover"))
+    //         }
+    //         let array = this.#resolvedPromisesArray.length
+    //         const r = await this.getStates
+    //         if (r.status === 'rejected') {
+    //                 throw new Error(`Promesse ${r.reason} non tenable`, {cause: r.reason})
+    //             }
+    //         if (!this.#click || this.#status === 'hoveredCompleted' || this.#status === 'canResume') {
+    //             this.#scrolling = true
+    //             this.#onFulfilled(array)
+    //         }
+    //         return
+    //     } catch (error) {
+    //         this.#onReject()
+    //     }
+    // }
     
     /**
      * Permet de passer au next Slide si les conditions sont réunies
@@ -346,7 +396,7 @@ export class Carousel
             this.#resolvedPromisesArray = []
             this.#status = 'completed'
 
-            if (this.#status === 'completed') return this.#observe(this.element)
+            if (this.#status === 'completed') return this.observe(this.element)
         }
         this.#scrolling ? this.#scrolling = false : null
         return
@@ -363,7 +413,7 @@ export class Carousel
             this.#click = false
             this.#scrolling ? this.#scrolling = false : null
             this.#status = 'clickComplete'
-            if (this.#status === 'clickComplete') return this.#observe(this.element)
+            if (this.#status === 'clickComplete') return this.observe(this.element)
         }
         return
     }
@@ -431,70 +481,6 @@ export class Carousel
         const time = this.#endTime - this.#startTime
         return this.#currentTime = this.#autoSlideDuration - time
     }
-
-    /**
-     * Permet de pause l'animation lors d'un mouse hover
-     * @param {PointerEvent} e 
-     */
-    #onHover() {
-        if (this.#click || this.#status === 'hovered') return
-
-        this.endTime
-        this.#resolvedPromisesArray = []
-        this.#status === 'canResume' ? null : this.#status = 'hovered'
-
-        if (this.#loadingBar) this.#loadingBar.style.animationPlayState = 'paused'
-    }
-
-    /**
-     * Relance l'animation quand le pointer est enlevé de l'item
-     * @param {PointerEvent} e 
-     */
-    #onPointerOut(e) {
-        if (this.#click) return
-        
-        if (this.#status === 'canResume') {
-            this.#status = 'hoveredCompleted'
-            this.#hovered = false
-            this.#resolvedPromisesArray = []
-            if (this.#status === 'hoveredCompleted') {
-                if (this.#loadingBar) {
-                    this.currentTime
-                    this.#loadingBar.style.animationPlayState = 'running'
-                    this.#observe(this.element)
-                }
-            }
-        }
-        return
-    }
-
-    /**
-     * Permet de créer un EventListener pour une action Souris contenant un CustomEvent
-     * @param {HTMLElement} object 
-     * @param {EventListenerOptions} eventToListen 
-     * @param {CustomElementConstructor} customEvent  
-     * @param {number} animationDelay 
-     * @function funct une fonction associée à l'évènement
-     * @param {FunctionStringCallback} args Les arguments de la fonction si nécessaire 
-     */
-    #createEventListenerFromMouse(object, eventToListen , customEvent, animationDelay = false, funct = null, args = null) {
-        object.addEventListener(eventToListen, (e) => {
-            
-            if (funct && (this.#status !== 'hovered' && this.#status !== 'clicked')) funct(args)
-            
-            this.#eventAction = e.clientX
-            this.#resolvedPromisesArray = []
-            this.#click ? this.#hovered = false : this.#hovered = true
-
-            let newEvent = new CustomEvent(`${customEvent}`, {
-                bubbles: false,
-                detail: e
-            }, {once: true})
-            object.dispatchEvent(newEvent)
-
-            animationDelay ? this.#getAnimationDelay : null
-        })
-    }
     
     /**
      * Permet de créer un EventListener contenant un CustomEvent
@@ -514,54 +500,15 @@ export class Carousel
                 detail: this.e
             }, {once: true})
             object.dispatchEvent(newEvent)
-            animationDelay ? this.#getAnimationDelay : null
+            animationDelay ? this.getAnimationDelay : null
         })
-    }
-    
-    /**
-     * Debounce le hover
-     * @param {HTMLElement} object 
-     * @param {AddEventListenerOptions} event 
-     * @fires [debounce] <this.#afterClickDelay>
-     */
-    #debounceMouse(object, event) {
-        object.addEventListener(event, debounce((e) => {
-            const video = this.container.querySelector('iframe')
-            if (this.#click || this.#status === 'clickComplete')  {
-                if (this.#loadingBar) this.#loadingBar.style.animationPlayState = 'running'
-                this.#scrolling = false
-                return
-            }
-            const mouseEvent = e.detail
-            let X = mouseEvent.clientX
-            let Y = mouseEvent.clientY
-            let mousePosition = X
-
-            if (mousePosition !== this.#eventAction) return mousePosition = X
-
-            // if (video) {
-            //     console.log('jai un iframe')
-            //     return
-            // } else {
-            //     console.log('test')
-            //     this.#status === 'hovered' ? this.#status = 'canResume' : null
-            //     return this.#onPointerOut()
-            // }
-            this.#status === 'hovered' ? this.#status = 'canResume' : null
-            return this.#onPointerOut()
-            // if (video) {
-            //     return
-            // } else {
-            //     return this.#onPointerOut()
-            // }
-        }, (this.#afterClickDelay)))
     }
 
     /**
      * Debounce le clic de la pagination ou des boutons droite et gauche
      * @param {HTMLElement} object 
      * @param {AddEventListenerOptions} event 
-     * @fires [debounce] <this.#afterClickDelay>
+     * @fires [debounce] <this.afterClickDelay>
      */
     debounce(object, event) {
         object.addEventListener(event, debounce( () => {
@@ -572,10 +519,10 @@ export class Carousel
                     return
                 } else {
                     this.#scrolling = false
-                    return this.#observe(this.element)
+                    return this.observe(this.element)
                 }
             }
-        }, (this.#afterClickDelay)))
+        }, (this.afterClickDelay)))
     }
 
     // #cancelPromise() {
@@ -601,9 +548,9 @@ export class Carousel
     /**
      * @returns {@function | delayAnimation}
      */
-    get #getAnimationDelay() {
+    get getAnimationDelay() {
         if (!this.#click) return this.#delayAnimation(this.#autoSlideDuration)
-        return this.#delayAnimation(this.#afterClickDelay + this.#autoSlideDuration)
+        return this.#delayAnimation(this.afterClickDelay + this.#autoSlideDuration)
     }
 
     /**
@@ -655,7 +602,7 @@ export class Carousel
                 })
                 activeButton.classList.add('carousel__pagination__button--active')
                 this.#loadingBar ? activeButton.append(this.#loadingBar) : null
-                this.#getAnimationDelay
+                this.getAnimationDelay
                 this.#intersect ? this.startTime : null
                 delete this.startTime
             }
@@ -781,7 +728,7 @@ export class Carousel
     }
 
     /** @returns {@param | options.afterClickDelay} */
-    get #afterClickDelay() {
+    get afterClickDelay() {
         return this.options.afterClickDelay
     }
 
@@ -793,5 +740,54 @@ export class Carousel
     /** @returns {number} */
     get carouselWidth() {
         return this.root.offsetWidth
+    }
+
+    get getScrollingStatus() {
+        return this.#scrolling
+    }
+
+    /** @param {Set} status */
+    set setScrollingStatus(status) {
+        this.#scrolling = status
+    }
+
+    get getClickStatus() {
+        return this.#click
+    }
+
+    set setClickStatus(status) {
+        this.#click = status
+    }
+
+    get getPromiseArray() {
+        return this.#resolvedPromisesArray
+    }
+
+    set setPromiseArray(status) {
+        this.#resolvedPromisesArray = status
+    }
+
+    get getLoadingBar() {
+        return this.#loadingBar
+    }
+
+    set setLoadingBar(status) {
+        this.#loadingBar = status
+    }
+
+    get getStatus() {
+        return this.#status
+    }
+
+    set setStatus(status) {
+        this.#status = status
+    }
+
+    get getHoverStatus() {
+        return this.#hovered
+    }
+
+    set setHoverStatus(status) {
+        this.#hovered = status
     }
 }

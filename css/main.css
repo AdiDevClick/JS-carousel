@@ -459,10 +459,12 @@ body {
         opacity: 0.85;
     }
     100% {
-        background-color: red;
+        background-color: rgb(255, 72, 50);
+        /* background-color: red; */
         /* transform: scaleX(1); */
         width: 100%;
-        opacity: 0.35;
+        opacity: 0.2;
+        /* opacity: 0.35; */
         border-right: 4px rgb(237, 243, 237) solid;
         /* display: none; */
     }
