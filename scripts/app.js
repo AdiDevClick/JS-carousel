@@ -1,4 +1,5 @@
 import { Carousel } from "./components/Carousel.js"
+import { YoutubePlayer } from "./components/YoutubePlayer.js"
 
 // window.addEventListener('DOMContentLoaded', () => {
 //     new Carousel(document.querySelector('#carousel1'), {
@@ -25,6 +26,7 @@ import { Carousel } from "./components/Carousel.js"
 // })
 
 const onReady = function() {
+    
     new Carousel(document.querySelector('#carousel1'), {
         slidesToScroll: 2,
         visibleSlides: 2,
@@ -63,6 +65,7 @@ const onReady = function() {
         automaticScrolling: true,
         loop: false,
     })
+    // new YoutubePlayer
 }
 
 if (window.readyState !== 'loading') {

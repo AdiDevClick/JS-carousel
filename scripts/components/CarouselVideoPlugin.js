@@ -1,5 +1,8 @@
 import { debounce } from "../functions/dom.js"
 import { Carousel } from "./Carousel.js"
+import { YoutubePlayer } from "./YoutubePlayer.js"
+// import * as player from "https://www.youtube.com/iframe_api"
+
 
 /**
  * Permet de rajouter une fonction hoover qui prend en compte des videos
@@ -8,15 +11,17 @@ export class CarouselVideoPlugin {
 
     #hovered = false
     #eventAction
-    #player
+    #player = window.player
     #done = false
+    #url = "https://www.youtube.com/iframe_api"
+    #globalName
 
     /**
      * @param {Carousel} carousel 
      */
     constructor(carousel) {
         this.carousel = carousel
-        this.#player = window.player
+        // this.#player = window
         // console.log("status du clic en debut de plugin : ",carousel.getClickStatus) 
         carousel.items.forEach(item => {
             if (carousel.getClickStatus !== true || carousel.getStatus !== 'clicked') {
@@ -27,8 +32,46 @@ export class CarouselVideoPlugin {
             }
             return
         })
-        this.#onYouTubeIframeAPIReady()
+        new YoutubePlayer(carousel)
+        // this.#loadScript(this.#url, window.YT)
+        //     .then(() => console.log('YT API Loaded. Youtube embedded is now ready.'))
+        // console.log(this.#globalName)
+        // this.#iFrameCreation()
+        // if (window.YT) {
+        //     this.onYouTubeIframeAPIReady()
+        // }
+        // this.onYouTubeIframeAPIReady()
         // this.carousel = carousel
+        
+    }
+
+    #loadScript(scriptUrl, globalName) {
+        if (globalName && window[globalName]) return Promise.resolve()
+
+        return new Promise((resolve, reject) => {
+            // const iframe = document.getElementById('videoIFrame')
+            
+            if (!window.YT) { 
+                let scr = document.createElement('script')
+                scr.type = "text/javascript"
+                scr.setAttribute('id', 'videoIFrame')
+                // scr.setAttribute('async', '')
+                scr.src = scriptUrl
+                // document.getElementsByTagName('head')[0].appendChild(scr)
+                const firstScriptTag = document.getElementsByTagName('script')[0]
+                firstScriptTag.parentNode.insertBefore(scr, firstScriptTag)
+            
+                scr.onload = (() => {
+                    !globalName || window[globalName] ?
+                    resolve() :
+                    reject(Error('window.' + globalName + ' undefined'))
+                })
+
+                scr.onerror = () => reject(Error('Error loading ' + globalName||scriptUrl))
+                // this.#globalName = YT
+                // console.log(window.YT)
+            }
+        })
     }
 
     /**
@@ -142,46 +185,53 @@ export class CarouselVideoPlugin {
         (video.paused) ? video.play() : video.pause()
     }
 
-    // #iFrameCreation() {
-    //     const tag = document.createElement('script')
+    #iFrameCreation() {
+        if (!window.YT) {
+            const tag = document.createElement('script')
 
-    //     tag.src = "https://www.youtube.com/iframe_api"
-    //     const firstScriptTag = document.getElementsByTagName('script')[0]
-    //     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
-    // }
+            tag.src = "https://www.youtube.com/iframe_api"
+            const firstScriptTag = document.getElementsByTagName('script')[0]
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+        }
+        
+    }
 
     // 3. This function creates an <iframe> (and YouTube player)
     //    after the API code downloads.
-    #onYouTubeIframeAPIReady() {
-        this.#player = new YT.Player('player', {
-            videoId: 'UzRY3BsWFYg',
-            playerVars: { 'autoplay': 1, 'controls': 0 },
-            events: {
-                'onReady': this.#onPlayerReady,
-                'onPlaybackQualityChange': onPlayerPlaybackQualityChange,
-                'onStateChange': this.#onPlayerStateChange,
-                'onError': onPlayerError
-            }
-        })
-    }      
+    onYouTubeIframeAPIReady() {
+        // if (window.YT) {
+            this.#player = new window.YT.Player('player', {
+                videoId: 'UzRY3BsWFYg',
+                playerVars: { 'autoplay': 1, 'controls': 0 },
+                events: {
+                    'onReady': this.#onPlayerReady,
+                    // 'onPlaybackQualityChange': onPlayerPlaybackQualityChange,
+                    'onStateChange': this.#onPlayerStateChange,
+                    // 'onError': onPlayerError
+                }
+            })
+            
+        // }
+        console.log(this.#player)
+    }
 
     // 4. The API will call this function when the video player is ready.
     #onPlayerReady(event) {
-        event.target.playVideo();
+        event.target.playVideo()
     }
 
     // 5. The API calls this function when the player's state changes.
     //    The function indicates that when playing a video (state=1),
     //    the player should play for six seconds and then stop.
     #onPlayerStateChange(event) {
-        if (event.data == YT.PlayerState.PLAYING && !this.#done) {
+        if (event.data === YT.PlayerState.PLAYING && !this.#done) {
             setTimeout(this.#stopVideo, 6000)
             this.#done = true
         }
-      }
+    }
 
     #stopVideo() {
-        this.#player.stopVideo();
+        this.#player.stopVideo()
     }
 
 }

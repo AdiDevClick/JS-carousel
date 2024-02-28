@@ -89,7 +89,7 @@ export class Carousel
         let children = [].slice.call(element.children)
 
         // Modification du DOM
-        this.#iFrameCreation()
+        // this.#iFrameCreation()
         this.root = createElement('div', {class: 'carousel'})
         this.container = createElement('div', {class: 'carousel__container'})
         this.root.setAttribute('tabindex', 0)
@@ -164,10 +164,12 @@ export class Carousel
             const tag = document.createElement('script')
             tag.setAttribute('id', 'videoIFrame')
             tag.src = "https://www.youtube.com/iframe_api"
+            // tag.type = "module"
+            // tag.origin = "https://127.0.0.1:5500"
             
             const firstScriptTag = document.getElementsByTagName('script')[0]
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
-        }        
+        }
     }
 
     disableTransition() {
@@ -328,7 +330,8 @@ export class Carousel
                 this.#resolvedPromisesArray.push(await waitAndFail(100, "j'ai clic"))
                 array = this.#resolvedPromisesArray.length 
                 // console.log('je demandé un clicked')
-            } else if (this.#status !== 'hoveredCompleted' && !this.#click && !this.#hovered){
+            } else if (this.#status !== 'hoveredCompleted' && !this.#click){
+            // } else if (this.#status !== 'hoveredCompleted' && !this.#click && !this.#hovered){
                 this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration, "J'ai demandé un slide normal"))
                 // console.log('jai demande un slide normal')
             } else {
