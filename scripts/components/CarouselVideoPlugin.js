@@ -12,7 +12,7 @@ export class CarouselVideoPlugin {
     #hovered = false
     #eventAction
     #player = window.player
-    #done = false
+    // done = false
     #url = "https://www.youtube.com/iframe_api"
     #globalName
 
@@ -32,7 +32,7 @@ export class CarouselVideoPlugin {
             }
             return
         })
-        new YoutubePlayer(carousel)
+        new YoutubePlayer(this)
         // this.#loadScript(this.#url, window.YT)
         //     .then(() => console.log('YT API Loaded. Youtube embedded is now ready.'))
         // console.log(this.#globalName)
@@ -78,9 +78,11 @@ export class CarouselVideoPlugin {
      * Permet de pause l'animation lors d'un mouse hover
      * @param {PointerEvent} e 
      */
-    #onHover() {
+    #onHover() {        
         if (this.carousel.getClickStatus || this.carousel.getStatus === 'hovered') return
         // this.carousel.getClickStatus ? this.carousel.setHoverStatus = false : this.carousel.setHoverStatus = true
+        
+        
         this.carousel.endTime
         this.carousel.setPromiseArray = []
         this.carousel.getStatus === 'canResume' ? null : this.carousel.setStatus = 'hovered'
@@ -160,7 +162,10 @@ export class CarouselVideoPlugin {
             let Y = mouseEvent.clientY
             let mousePosition = X
 
-            if (mousePosition !== this.#eventAction) return mousePosition = X
+            if (mousePosition !== this.#eventAction || !this.done) {
+                console.log('video note done')
+                return mousePosition = X
+            }
 
             // if (video) {
             //     console.log('jai un iframe')
@@ -224,9 +229,9 @@ export class CarouselVideoPlugin {
     //    The function indicates that when playing a video (state=1),
     //    the player should play for six seconds and then stop.
     #onPlayerStateChange(event) {
-        if (event.data === YT.PlayerState.PLAYING && !this.#done) {
+        if (event.data === YT.PlayerState.PLAYING && !this.done) {
             setTimeout(this.#stopVideo, 6000)
-            this.#done = true
+            this.done = true
         }
     }
 

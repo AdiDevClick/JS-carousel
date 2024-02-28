@@ -12,11 +12,12 @@ events = {
         // 'onError': onPlayerError
     }
 }
-done = false
+// done = false
 // #url = "https://www.youtube.com/iframe_api"
 // #globalName = window.YT
 
     constructor(carousel) {
+        this.video = carousel
         // this.#loadScript(this.#url, this.#globalName)
         //     .then(() => console.log('YT API Loaded. Youtube embedded is now ready.'))
         this.#iFrameCreation(carousel)
@@ -95,17 +96,20 @@ done = false
     //    The function indicates that when playing a video (state=1),
     //    the player should play for six seconds and then stop.
     onPlayerStateChange(event) {
-        if (event.data === window.YT.PlayerState.PLAYING && !this.done) {
+        if (event.data === window.YT.PlayerState.PLAYING && !this.ca.done) {
             setTimeout(e => this.stopVideo(e), 3000)
-            this.done = true
+            // console.log('video done')
+            
         } else {
-            this.done = false
+            this.video.done = false
             // event.target.playVideo()
         }
     }
 
     stopVideo(e) {
+        console.log('video stoped')
         this.player.stopVideo()
+        this.video.done = true
     }
 }
 

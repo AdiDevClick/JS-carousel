@@ -35,6 +35,7 @@ export class Carousel
                 this.#intersect = true
                 this.#whileFalse()
                 this.#animate()
+                this.#showLoadingBar()
                 this.startTime
                 return
             } else {
@@ -53,6 +54,7 @@ export class Carousel
     #eventAction
     #myIndex
     #reverseMode = false
+    done = false
 
     /**
      * @param {HTMLElement} element 
@@ -151,6 +153,7 @@ export class Carousel
             //     }
             //     return
             // })
+            // this.#showLoadingBar()
             new CarouselVideoPlugin(this)
         }
 
@@ -320,62 +323,34 @@ export class Carousel
      * Fonction principale de l'auto-scrolling
      * @returns 
      */
-    async #whileFalse() {
-        if (this.getScrollingStatus || !this.#intersect || this.#status === 'hovered') return
-        // if (this.#scrolling || !this.#intersect || this.#status === 'hovered' || this.#hovered) return
-        
-        try {
-            // console.log(`click status : ${this.#click}, hover status : ${this.#hovered}, global status : ${this.#status}`)
-            if ((this.getClickStatus || this.#status === 'clicked')) {
-                this.#resolvedPromisesArray.push(await waitAndFail(100, "j'ai clic"))
-                array = this.#resolvedPromisesArray.length 
-                // console.log('je demandé un clicked')
-            } else if (this.#status !== 'hoveredCompleted' && !this.#click){
-            // } else if (this.#status !== 'hoveredCompleted' && !this.#click && !this.#hovered){
-                this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration, "J'ai demandé un slide normal"))
-                // console.log('jai demande un slide normal')
-            } else {
-                this.#resolvedPromisesArray = []
-                
-                this.#resolvedPromisesArray.push(await wait(this.#currentTime, "J'ai demandé un slide après un hover"))
-                // console.log(this.#currentTime)
-                // console.log('jai demander un slide apres hover')
-            }
-            let array = this.#resolvedPromisesArray.length
-            const r = await this.getStates
-            if (r.status === 'rejected') {
-                    throw new Error(`Promesse ${r.reason} non tenable`, {cause: r.reason})
-                }
-            if (!this.getClickStatus || this.#status === 'hoveredCompleted' || this.#status === 'canResume') {
-                this.setScrollingStatus = true
-                this.#onFulfilled(array)
-            }
-            return
-        } catch (error) {
-            this.#onReject()
-        }
-    }
     // async #whileFalse() {
-    //     if (this.#scrolling || !this.#intersect || this.#status === 'hovered') return
+    //     if (this.getScrollingStatus || !this.#intersect || this.#status === 'hovered') return
     //     // if (this.#scrolling || !this.#intersect || this.#status === 'hovered' || this.#hovered) return
         
     //     try {
-    //         if ((this.#click || this.#status === 'clicked')) {
+    //         // console.log(`click status : ${this.#click}, hover status : ${this.#hovered}, global status : ${this.#status}`)
+    //         if ((this.getClickStatus || this.#status === 'clicked')) {
     //             this.#resolvedPromisesArray.push(await waitAndFail(100, "j'ai clic"))
     //             array = this.#resolvedPromisesArray.length 
+    //             // console.log('je demandé un clicked')
     //         } else if (this.#status !== 'hoveredCompleted' && !this.#click){
+    //         // } else if (this.#status !== 'hoveredCompleted' && !this.#click && !this.#hovered){
     //             this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration, "J'ai demandé un slide normal"))
+    //             // console.log('jai demande un slide normal')
     //         } else {
     //             this.#resolvedPromisesArray = []
+                
     //             this.#resolvedPromisesArray.push(await wait(this.#currentTime, "J'ai demandé un slide après un hover"))
+    //             // console.log(this.#currentTime)
+    //             // console.log('jai demander un slide apres hover')
     //         }
     //         let array = this.#resolvedPromisesArray.length
     //         const r = await this.getStates
     //         if (r.status === 'rejected') {
     //                 throw new Error(`Promesse ${r.reason} non tenable`, {cause: r.reason})
     //             }
-    //         if (!this.#click || this.#status === 'hoveredCompleted' || this.#status === 'canResume') {
-    //             this.#scrolling = true
+    //         if (!this.getClickStatus || this.#status === 'hoveredCompleted' || this.#status === 'canResume') {
+    //             this.setScrollingStatus = true
     //             this.#onFulfilled(array)
     //         }
     //         return
@@ -383,6 +358,39 @@ export class Carousel
     //         this.#onReject()
     //     }
     // }
+    async #whileFalse() {
+        if (this.#scrolling || !this.#intersect || this.#status === 'hovered') return
+        // if (this.#scrolling || !this.#intersect || this.#status === 'hovered' || this.#hovered) return
+        
+        try {
+            // console.log('je suis dans le while')
+            if ((this.#click || this.#status === 'clicked')) {
+                this.#resolvedPromisesArray.push(await waitAndFail(100, "j'ai clic"))
+                // console.log('je demande un fail')
+                array = this.#resolvedPromisesArray.length 
+            } else if (this.#status !== 'hoveredCompleted' && !this.#click){
+                this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration, "J'ai demandé un slide normal"))
+                // console.log('je demande un slide normal')
+            } else {
+                this.#resolvedPromisesArray = []
+                this.#resolvedPromisesArray.push(await wait(this.#currentTime, "J'ai demandé un slide après un hover"))
+                // console.log('je demande un hover')
+            }
+            let array = this.#resolvedPromisesArray.length
+            const r = await this.getStates
+            if (r.status === 'rejected') {
+                    throw new Error(`Promesse ${r.reason} non tenable`, {cause: r.reason})
+                }
+            if (!this.#click || this.#status === 'hoveredCompleted' || this.#status === 'canResume') {
+                // console.log('je demande un fulfill')
+                this.#scrolling = true
+                this.#onFulfilled(array)
+            }
+            return
+        } catch (error) {
+            this.#onReject()
+        }
+    }
     
     /**
      * Permet de passer au next Slide si les conditions sont réunies
@@ -543,8 +551,16 @@ export class Carousel
      */
     #delayAnimation(duration) {
         if (this.#loadingBar) {
+            this.#showLoadingBar()
+            this.#animate()
+            // 
+            // console.log('duration : ' + duration)
             this.#loadingBar.style.animationDuration = `${duration}ms`
-            if (this.#intersect) this.#showLoadingBar()
+            if (this.#intersect) {
+                this.#showLoadingBar()
+                this.#animate()
+                // console.log('ca intersect')
+            }
         }
     }
 
