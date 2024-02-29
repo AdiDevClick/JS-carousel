@@ -12,7 +12,8 @@ export class CarouselVideoPlugin {
     #hovered = false
     #eventAction
     #player = window.player
-    // done = false
+    player
+    done = null
     #url = "https://www.youtube.com/iframe_api"
     #globalName
 
@@ -24,15 +25,22 @@ export class CarouselVideoPlugin {
         // this.#player = window
         // console.log("status du clic en debut de plugin : ",carousel.getClickStatus) 
         carousel.items.forEach(item => {
+            this.player = new YoutubePlayer(this.item)
             if (carousel.getClickStatus !== true || carousel.getStatus !== 'clicked') {
+
                 this.#createEventListenerFromMouse(item, 'mouseover' , 'mouseDebounce', false, this.#onHover.bind(this))
                 // this.#createEventListenerFromMouse(item, 'touchstart' , 'mouseDebounce', false, this.#onHover.bind(this))
                 this.#debounceMouse(item, 'mouseDebounce')
                 item.addEventListener('mouseout', e => this.#onPointerOut(e))
+                
+                // this.item = item
             }
             return
         })
-        new YoutubePlayer(this)
+
+        // this.player = new YoutubePlayer(carousel.items)
+        console.log(this.player)
+
         // this.#loadScript(this.#url, window.YT)
         //     .then(() => console.log('YT API Loaded. Youtube embedded is now ready.'))
         // console.log(this.#globalName)
@@ -78,14 +86,16 @@ export class CarouselVideoPlugin {
      * Permet de pause l'animation lors d'un mouse hover
      * @param {PointerEvent} e 
      */
-    #onHover() {        
-        if (this.carousel.getClickStatus || this.carousel.getStatus === 'hovered') return
+    #onHover() {
+        console.log('je hover, done status : ' + this.done + 'hover status : '+ this.#hovered + ' carousel status : '+this.carousel.getStatus)
+        if (this.carousel.getClickStatus) return
         // this.carousel.getClickStatus ? this.carousel.setHoverStatus = false : this.carousel.setHoverStatus = true
-        
-        
         this.carousel.endTime
         this.carousel.setPromiseArray = []
+
         this.carousel.getStatus === 'canResume' ? null : this.carousel.setStatus = 'hovered'
+        // this.carousel.getStatus === 'canResume' ? null : this.#hovered = true
+
         if (this.carousel.getLoadingBar) this.carousel.getLoadingBar.style.animationPlayState = 'paused'
     }
 
@@ -99,7 +109,11 @@ export class CarouselVideoPlugin {
         if (this.carousel.getStatus === 'canResume') {
             this.carousel.setStatus = 'hoveredCompleted'
             this.carousel.setHoverStatus = false
-            // this.#hovered = false
+            this.#hovered = false
+            console.log('jai demander de pause la video')
+            // this.#hovered ? this.player.onPlayerStateChange(this.player) : null
+            !this.#hovered ? this.player.getPauseVideo : null
+            // this.#hovered ? this.player.onPlayerStateChange(this.player) : null
             this.carousel.setPromiseArray = []
             if (this.carousel.getStatus === 'hoveredCompleted') {
                 if (this.carousel.getLoadingBar) {
@@ -126,11 +140,15 @@ export class CarouselVideoPlugin {
         object.addEventListener(eventToListen, (e) => {
             if (funct && (this.carousel.getStatus !== 'hovered' && this.carousel.getStatus !== 'clicked')) funct(args)
             
+            // this.#hovered ? this.player.onPlayerReady(this.player.events.events.target) : null
+            this.#hovered ? this.player.getOnPlayerReady: null
+            // this.#hovered ? this.player.events.events.target.playVideo() : null
+
             this.#eventAction = e.clientX
             this.carousel.setPromiseArray = []
             // console.log('click status dans le debounce : ', this.carousel.getClickStatus)
             this.carousel.getClickStatus ? this.carousel.setHoverStatus = false : this.carousel.setHoverStatus = true
-            // this.carousel.getClickStatus ? this.#hovered = false : this.#hovered = true
+            this.carousel.getClickStatus ? this.#hovered = false : this.#hovered = true
             // console.log('hover status dans le debounce : ', this.carousel.getHoverStatus)
             let newEvent = new CustomEvent(`${customEvent}`, {
                 bubbles: false,
@@ -162,8 +180,9 @@ export class CarouselVideoPlugin {
             let Y = mouseEvent.clientY
             let mousePosition = X
 
-            if (mousePosition !== this.#eventAction || !this.done) {
-                console.log('video note done')
+            if (mousePosition !== this.#eventAction) {
+                console.log('video not done')
+                console.log('done status :' + this.done)
                 return mousePosition = X
             }
 
@@ -203,40 +222,51 @@ export class CarouselVideoPlugin {
 
     // 3. This function creates an <iframe> (and YouTube player)
     //    after the API code downloads.
-    onYouTubeIframeAPIReady() {
-        // if (window.YT) {
-            this.#player = new window.YT.Player('player', {
-                videoId: 'UzRY3BsWFYg',
-                playerVars: { 'autoplay': 1, 'controls': 0 },
-                events: {
-                    'onReady': this.#onPlayerReady,
-                    // 'onPlaybackQualityChange': onPlayerPlaybackQualityChange,
-                    'onStateChange': this.#onPlayerStateChange,
-                    // 'onError': onPlayerError
-                }
-            })
+    // onYouTubeIframeAPIReady() {
+    //     // if (window.YT) {
+    //         this.#player = new window.YT.Player('player', {
+    //             videoId: 'UzRY3BsWFYg',
+    //             playerVars: { 'autoplay': 1, 'controls': 0 },
+    //             events: {
+    //                 'onReady': this.#onPlayerReady,
+    //                 // 'onPlaybackQualityChange': onPlayerPlaybackQualityChange,
+    //                 'onStateChange': this.#onPlayerStateChange,
+    //                 // 'onError': onPlayerError
+    //             }
+    //         })
             
-        // }
-        console.log(this.#player)
-    }
+    //     // }
+    //     console.log(this.#player)
+    // }
 
     // 4. The API will call this function when the video player is ready.
-    #onPlayerReady(event) {
-        event.target.playVideo()
-    }
+    // #onPlayerReady(event) {
+    //     event.target.playVideo()
+    // }
 
     // 5. The API calls this function when the player's state changes.
     //    The function indicates that when playing a video (state=1),
     //    the player should play for six seconds and then stop.
-    #onPlayerStateChange(event) {
-        if (event.data === YT.PlayerState.PLAYING && !this.done) {
-            setTimeout(this.#stopVideo, 6000)
-            this.done = true
-        }
-    }
+    // #onPlayerStateChange(event) {
+    //     if (event.data === YT.PlayerState.PLAYING && !this.done) {
+    //         setTimeout(this.#stopVideo, 6000)
+    //         this.done = true
+    //     }
+    // }
 
     #stopVideo() {
         this.#player.stopVideo()
     }
 
+    get getHoverStatus() {
+        return this.#hovered
+    }
+
+    get getDoneStatus() {
+        return this.done
+    }
+
+    set setDoneStatus(status) {
+        return this.done = status
+    }
 }

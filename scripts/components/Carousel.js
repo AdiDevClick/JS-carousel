@@ -54,7 +54,7 @@ export class Carousel
     #eventAction
     #myIndex
     #reverseMode = false
-    done = false
+    // done = false
 
     /**
      * @param {HTMLElement} element 
