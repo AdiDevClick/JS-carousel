@@ -25,7 +25,7 @@ export class CarouselVideoPlugin {
         // this.#player = window
         // console.log("status du clic en debut de plugin : ",carousel.getClickStatus) 
         carousel.items.forEach(item => {
-            this.player = new YoutubePlayer(item)
+            // this.player = new YoutubePlayer(item)
             if (carousel.getClickStatus !== true || carousel.getStatus !== 'clicked') {
 
                 this.#createEventListenerFromMouse(item, 'mouseover' , 'mouseDebounce', false, this.#onHover.bind(this))
@@ -38,7 +38,7 @@ export class CarouselVideoPlugin {
             
         })
 
-        // this.player = new YoutubePlayer(carousel)
+        // this.player = new YoutubePlayer(this.carousel)
         // console.log(this.carousel.getVideoPlayer)
         // console.log(this.player)
         // this.#loadScript(this.#url, window.YT)
@@ -53,34 +53,34 @@ export class CarouselVideoPlugin {
         
     }
 
-    #loadScript(scriptUrl, globalName) {
-        if (globalName && window[globalName]) return Promise.resolve()
+    // #loadScript(scriptUrl, globalName) {
+    //     if (globalName && window[globalName]) return Promise.resolve()
 
-        return new Promise((resolve, reject) => {
-            // const iframe = document.getElementById('videoIFrame')
+    //     return new Promise((resolve, reject) => {
+    //         // const iframe = document.getElementById('videoIFrame')
             
-            if (!window.YT) { 
-                let scr = document.createElement('script')
-                scr.type = "text/javascript"
-                scr.setAttribute('id', 'videoIFrame')
-                // scr.setAttribute('async', '')
-                scr.src = scriptUrl
-                // document.getElementsByTagName('head')[0].appendChild(scr)
-                const firstScriptTag = document.getElementsByTagName('script')[0]
-                firstScriptTag.parentNode.insertBefore(scr, firstScriptTag)
+    //         if (!window.YT) { 
+    //             let scr = document.createElement('script')
+    //             scr.type = "text/javascript"
+    //             scr.setAttribute('id', 'videoIFrame')
+    //             // scr.setAttribute('async', '')
+    //             scr.src = scriptUrl
+    //             // document.getElementsByTagName('head')[0].appendChild(scr)
+    //             const firstScriptTag = document.getElementsByTagName('script')[0]
+    //             firstScriptTag.parentNode.insertBefore(scr, firstScriptTag)
             
-                scr.onload = (() => {
-                    !globalName || window[globalName] ?
-                    resolve() :
-                    reject(Error('window.' + globalName + ' undefined'))
-                })
+    //             scr.onload = (() => {
+    //                 !globalName || window[globalName] ?
+    //                 resolve() :
+    //                 reject(Error('window.' + globalName + ' undefined'))
+    //             })
 
-                scr.onerror = () => reject(Error('Error loading ' + globalName||scriptUrl))
-                // this.#globalName = YT
-                // console.log(window.YT)
-            }
-        })
-    }
+    //             scr.onerror = () => reject(Error('Error loading ' + globalName||scriptUrl))
+    //             // this.#globalName = YT
+    //             // console.log(window.YT)
+    //         }
+    //     })
+    // }
 
     /**
      * Permet de pause l'animation lors d'un mouse hover
@@ -207,21 +207,21 @@ export class CarouselVideoPlugin {
         }, (this.carousel.afterClickDelay)))
     }
 
-    #videoPlayback() {
-        const video = this.carousel.container.querySelector('iframe')
-        (video.paused) ? video.play() : video.pause()
-    }
+    // #videoPlayback() {
+    //     const video = this.carousel.container.querySelector('iframe')
+    //     (video.paused) ? video.play() : video.pause()
+    // }
 
-    #iFrameCreation() {
-        if (!window.YT) {
-            const tag = document.createElement('script')
+    // #iFrameCreation() {
+    //     if (!window.YT) {
+    //         const tag = document.createElement('script')
 
-            tag.src = "https://www.youtube.com/iframe_api"
-            const firstScriptTag = document.getElementsByTagName('script')[0]
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
-        }
+    //         tag.src = "https://www.youtube.com/iframe_api"
+    //         const firstScriptTag = document.getElementsByTagName('script')[0]
+    //         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+    //     }
         
-    }
+    // }
 
     // 3. This function creates an <iframe> (and YouTube player)
     //    after the API code downloads.
@@ -257,9 +257,9 @@ export class CarouselVideoPlugin {
     //     }
     // }
 
-    #stopVideo() {
-        this.#player.stopVideo()
-    }
+    // #stopVideo() {
+    //     this.#player.stopVideo()
+    // }
 
     get getHoverStatus() {
         return this.#hovered

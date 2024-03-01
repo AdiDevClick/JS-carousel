@@ -1,3 +1,4 @@
+import { Carousel } from "./Carousel.js"
 import { CarouselVideoPlugin } from "./CarouselVideoPlugin.js"
 
 export class YoutubePlayer {
@@ -6,7 +7,7 @@ event
 playing = false
 player
 done
-id
+id = []
 
 
 events = {
@@ -16,7 +17,7 @@ events = {
     allowfullscreen: '1',
     fullscreen: '1',
     // height: '720',
-    videoId: 'UzRY3BsWFYg',
+    videoId: this.videoId,
     playerVars: { 'autoplay': 0, 'controls': 0 , 'enablejsapi': 1, 'modestbranding': 1, 'rel': 0 },
     events: {
         // 'onReady': e => {
@@ -43,14 +44,43 @@ events = {
 // #globalName = window.YT
 
     /**
-     * @param {CarouselVideoPlugin} item 
+     * @param {Carousel} carousel
      */
-    constructor(item) {
-        this.id = item.querySelector('#player-id')
+    constructor(carousel) {
+        this.video = carousel
+        // this.id = item.getElementById('player-id')
+        // carousel.items.forEach(item => {
+        //     this.id = item.getElementById('player-id')
+        // })
+        // let id
+        // carousel.container.querySelectorAll('.player')
+        //     .forEach(element => 
+        //         this.id = element.getAttribute('id').split('#')[1]
+        //     )
+        carousel.container.querySelectorAll('.player')
+            .forEach(element => {
+                const id = element.getAttribute('id')
+                this.id.push('#' + id.split('#')[1])
+            })
+        console.log(this.id)
+        // carousel.container.querySelectorAll('id').forEach(element => id = element.getAttribute('id'))
+        // console.log(id)
+        // const playerId = id
+        // console.log(playerId)
+        // this.id = '#' + id.split('#')[1]
+        // console.log(target)
+        // if (playerId.startsWith('#')) {
+        // modal = document.querySelector(href)
+        // if (String.startsBy('player'))
+        
+        // carousel.element.querySelectorAll(target).forEach(id => {
+        //     this.id = id
+        // })
+        
         // this.#loadScript(this.#url, this.#globalName)
         //     .then(() => console.log('YT API Loaded. Youtube embedded is now ready.'))
         this.#iFrameCreation()
-        this.video = item
+        // this.video = items
         this.isHovered = this.video.getHoverStatus
         // console.log(carousel)
         // this.#loadScript()
@@ -120,13 +150,17 @@ events = {
         // const player = document.getElementById('player-id')
         // const id = this.id
         if (!this.player) {
-            console.log(this.id)
             console.log('creation du player')
-            this.player = new window.YT.Player(this.id, this.events) 
+            this.id.forEach(id => {
+                console.log(id)
+                this.videoId = id
+                this.player = new window.YT.Player('player-id'+id, this.events) 
+            })
+            // this.player = new window.YT.Player(this.id, this.events) 
             // this.player.push(videoPlayer)
         } else {
             console.log('le player existe deja')
-            this.player
+            return this.player
         }
     }
 

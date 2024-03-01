@@ -104,7 +104,9 @@ export class Carousel
             // this.#iFrameCreation()
             item.append(child)
             // this.#player = new YoutubePlayer(item)
+            
             this.container.append(item)
+            // new YoutubePlayer(child)
             return item
         })
         // children.forEach(child => {
@@ -160,6 +162,7 @@ export class Carousel
             new CarouselVideoPlugin(this)
         }
 
+        new YoutubePlayer(this)
         new CarouselTouchPlugin(this)
     }
 
