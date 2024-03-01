@@ -15,6 +15,37 @@
     </nav>
     <main>
         <div class="hero-title">Projet Carousel</div>
+        <template id="slide-template">
+            <div class="js-title">Carousel 1</div>
+            <div id="js-carousel-id">
+                <div class="item_container">
+                    <div class="item__image">
+                        <img class="js-img" src="img/img1.jpeg" alt="">
+                        <div class="js-video" id="player-id"></div>
+                    </div>
+                    <div class="item__body">
+                        <div class="item__title">
+                            Mon titre 1
+                        </div>
+                        <div class="item__description">
+                            Ici, une description de mon image carousel
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <section
+                data-endpoint="https://jsonplaceholder.typicode.com/users"
+                data-template="#slide-template"
+                data-target=".carousel1"
+                data-limit="2"
+                data-id='{"id": "#id"}'
+                data-elements='{"name": ".js-title", "carousel-id": "#js-carousel-id", "description": ".item__description" ,"title": ".item__title", "video": ".js-video", "image": ".js-img"}'
+                class="carousel_container">
+        </section>
+
+        <div class="hero-title">Projet Carousel</div>
         <section class="carousel_container">
             <div class="title">Carousel 1</div>
             <!-- <div id="player"></div> -->
@@ -25,7 +56,7 @@
                         <!-- style="width:100%;height:100%;border:none;" -->
                         <!-- <iframe poster="img/img1.jpeg" src="https://player.vimeo.com/video/562717273?h=939feaf80f&autoplay=1&title=0&byline=0&portrait=0" allowfullscreen></iframe> -->
                         <!-- <script src="https://player.vimeo.com/api/player.js"></script> -->
-                        <div id="player"></div>
+                        <div id="player-id"></div>
                         <!-- <iframe width="100%" height="100%" src="https://www.youtube.com/embed/UzRY3BsWFYg?si=uvBgqeIbuZlxthEi&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture;" allowfullscreen></iframe> -->
                         <!-- <video width="450" autoplay muted loop poster="img/img1.jpeg">
                             <source src="https://youtu.be/UzRY3BsWFYg" type="video/mp4">

@@ -1,3 +1,6 @@
+/* Example: tells browser to use UTF-8 character set */
+@charset "utf-8";
+
 :root {
     --fs-hero-title: 4rem;
     --f-hero-title-color: rgb(37, 36, 36);

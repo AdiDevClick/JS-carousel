@@ -2,25 +2,36 @@ import { CarouselVideoPlugin } from "./CarouselVideoPlugin.js"
 
 export class YoutubePlayer {
 
-event = []
+event
 playing = false
 player
+done
+id
+
 
 events = {
+    // width: '360',
     width: '100%',
     height: '100%',
+    allowfullscreen: '1',
+    fullscreen: '1',
+    // height: '720',
     videoId: 'UzRY3BsWFYg',
-    playerVars: { 'autoplay': 0, 'controls': 0 },
+    playerVars: { 'autoplay': 0, 'controls': 0 , 'enablejsapi': 1, 'modestbranding': 1, 'rel': 0 },
     events: {
-        'onReady': e => {
-            this.event = e
-            this.onPlayerReady(this.event)
-        },
+        // 'onReady': e => {
+        //     // this.event.push(e)
+        //     this.event = e
+        //     this.onPlayerReady(e)
+        // },
         // 'onReady': e => { if (this.video.getHoverStatus) this.onPlayerReady(e) },
-        // 'onReady': e => this.onPlayerReady(e),
+        // 'onReady': this.onPlayerReady,
+        'onReady': e => this.onPlayerReady(e),
         // 'onPlaybackQualityChange': onPlayerPlaybackQualityChange,
         'onStateChange': e => this.onPlayerStateChange(e),
+        // 'onStateChange': this.onPlayerStateChange,
         // 'onStateChange': e => {
+        //     // this.event.push(e)
         //     this.event = e
         //     this.onPlayerStateChange(e)
         // } ,
@@ -35,17 +46,18 @@ events = {
      * @param {CarouselVideoPlugin} item 
      */
     constructor(item) {
-        
+        this.id = item.querySelector('#player-id')
         // this.#loadScript(this.#url, this.#globalName)
         //     .then(() => console.log('YT API Loaded. Youtube embedded is now ready.'))
-        this.#iFrameCreation(item)
+        this.#iFrameCreation()
         this.video = item
+        this.isHovered = this.video.getHoverStatus
         // console.log(carousel)
         // this.#loadScript()
         // this.onYouTubeIframeAPIReady()
     }
 
-    #iFrameCreation(e) {
+    #iFrameCreation() {
         const iframe = document.getElementById('videoIFrame')
 
         if (!iframe) {
@@ -59,10 +71,10 @@ events = {
             // tag.type =  'image/svg+xml'
 
             window.onYouTubeIframeAPIReady = e => this.loadVideo(e)
+            
             // this.done = window.done
             const firstScriptTag = document.getElementsByTagName('script')[0]
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
-            
         } else {
             e => this.loadVideo(e)
             // this.loadVideo()
@@ -105,28 +117,44 @@ events = {
 // 3. This function creates an <iframe> (and YouTube player)
 //    after the API code downloads.
     loadVideo(e) {
-        const player = document.getElementById('player')
-        // if (player) {
-            this.player = new window.YT.Player(player, this.events) 
-        // } else {
-            // return
-        // }
+        // const player = document.getElementById('player-id')
+        // const id = this.id
+        if (!this.player) {
+            console.log(this.id)
+            console.log('creation du player')
+            this.player = new window.YT.Player(this.id, this.events) 
+            // this.player.push(videoPlayer)
+        } else {
+            console.log('le player existe deja')
+            this.player
+        }
     }
 
     // 4. The API will call this function when the video player is ready.
     onPlayerReady(e) {
-        // this.eventi = event
-        console.log('je demander a lancer')
-        // console.log(this.eventi)
-        console.log(this.event)
+        // const embedCode = e.target.getVideoEmbedCode()
         // e.target.playVideo()
-        if (e.data !== YT.PlayerState.PLAYING && this.video.getDoneStatus === true && this.video.getHoverStatus) {
+        // if (document.getElementById('embed-code')) {
+        //     document.getElementById('embed-code').innerHTML = embedCode
+        //     console.log(embedCode)
+        // }
+        // console.log(embedCode)
+        // this.event.push(e)
+        console.log('je demander a lancer')
+        // console.log(this.event)
+        // console.log(e)
+        // e.target.playVideo()
+        // if (e.data !== window.YT.PlayerState.PLAYING && (this.done !== false && this.video.getHoverStatus)) {
+        if (e.data !== window.YT.PlayerState.PLAYING) {
         // if (this.video.getHoverStatus) {
             console.log(e)
             console.log('je lance la video')
-            this.video.setDoneStatus = false
-            e.target.playVideo()
+            // this.done = false
+            // e.target.playVideo()
+            setTimeout(e => this.playVideo(e), 500)
+            // return e => onPlayerStateChange(e)
         }
+        // return e => onPlayerStateChange(e)
     }
 
     // 5. The API calls this function when the player's state changes.
@@ -137,47 +165,102 @@ events = {
         //     event.target.playVideo()
         //     console.log('je lance la video')
         //     this.video.done = false
-        // console.log('event du plyers state : ' + event + event.data + this.event)
-        // if (event.data !== YT.PlayerState.PLAYING && this.video.done !== false && this.video.getHoverStatus) {
-        //     console.log('je lance la video')
-        //     event.target.playVideo()
+        // if (!this.video.getHoverStatus) {
+        //     return e => onPlayerStateChange(e)
+            console.log(this.video.getHoverStatus)
         // }
-        console.log('je suis dans playerstatechange')
-        if (event.data === YT.PlayerState.PLAYING || YT.PlayerState.PAUSE && !this.video.getDoneStatus ) {
-            setTimeout(e => this.stopVideo(e), 12000)
+        // console.log('event du plyers state : ' + event + event.data + this.event)
+        if (event.data !== window.YT.PlayerState.PLAYING) {
+            // e => this.pauseVideo(e)
+            // setTimeout(e => this.playVideo(e), 500)
+            setTimeout(e => this.playVideo(e), 500)
+            console.log('je play la vid')
+            // return
+            // event.target.pauseVideo()
+        } else if (event.data === window.YT.PlayerState.PLAYING && !this.done) {
+            
+            // event.target.playVideo()
+            setTimeout(e => this.pauseVideo(e), 500)
+            console.log('je pause la video')
+            // return
+        } else if (event.data === window.YT.PlayerState.PLAYING || window.YT.PlayerState.PAUSE && !this.done) {
+            setTimeout(e => this.stopVideo(e), 22000)
             console.log('je dois stop')
+            // return
+        } else {
+            return e => onPlayerStateChange(e)
         }
+        
     }
 
-    stopVideo() {
+    stopVideo(e) {
         console.log('video stoped')
-        this.player.stopVideo()
-        this.video.setDoneStatus = true
+        if (this.video.getHoverStatus === false) {
+        // if (this.isHovered === false) {
+            this.player.stopVideo()
+            this.done  = true
+            return e => onPlayerStateChange(e)
+        }
+        
+        // return
+        return e => onPlayerStateChange(e)
     }
 
-    pauseVideo() {
+    playVideo(e) {
+        console.log('video play')
+        if (this.video.getHoverStatus === true) {
+        // if (this.isHovered === true) {
+            this.player.playVideo()
+            this.done  = false
+            return e => onPlayerStateChange(e)
+        // return
+        }
+        // return
+        return e => onPlayerStateChange(e)
+    }
+
+    pauseVideo(e) {
         console.log('video paused')
-        this.player.pauseVideo()
-        this.video.setDoneStatus = true
+        if (this.video.getHoverStatus === false) {
+        // if (this.isHovered === false) {
+            this.player.pauseVideo()
+            return e => onPlayerStateChange(e)
+        // this.done  = true
+        // return
+        }
+        // return
+        return e => onPlayerStateChange(e)
     }
 
+    // get getOnPlayerReady() {
+    //     // console.log('je suis dans le getter, voici le player : ' +this.player + this.event.target)
+    //     // if (this.player) {
+    //         // console.log('jai utiliser mon play getter')
+    //         // return this.loadVideo(this.event)
+    //         // return this.event.target.playVideo()
+    //         return this.onPlayerReady(this.event[0])
+    //     // }
+    // }
     get getOnPlayerReady() {
-        // if (this.event) {
-            return this.onPlayerReady(this.event)
+        // console.log('je suis dans le getter, voici le player : ' +this.player + this.event.target)
+        // if (this.player) {
+            console.log('jai utiliser mon play getter')
+            // return this.loadVideo(this.event)
+            // return this.event.target.playVideo()
+            e => this.playVideo(e)
+            // e => e.target.playVideo()
         // }
     }
 
     get getStopVideo() {
         // if (this.player) {
-            console.log(this.event)
-            return this.stopVideo()
+            e => this.stopVideo(e)
         // }
     }
 
     get getPauseVideo() {
         // if (this.player) {
-            console.log(this.event)
-            return this.pauseVideo()
+            e => this.pauseVideo(e)
         // }
     }
 }

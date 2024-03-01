@@ -25,7 +25,7 @@ export class CarouselVideoPlugin {
         // this.#player = window
         // console.log("status du clic en debut de plugin : ",carousel.getClickStatus) 
         carousel.items.forEach(item => {
-            this.player = new YoutubePlayer(this.item)
+            this.player = new YoutubePlayer(item)
             if (carousel.getClickStatus !== true || carousel.getStatus !== 'clicked') {
 
                 this.#createEventListenerFromMouse(item, 'mouseover' , 'mouseDebounce', false, this.#onHover.bind(this))
@@ -35,12 +35,12 @@ export class CarouselVideoPlugin {
                 
                 // this.item = item
             }
-            return
+            
         })
 
-        // this.player = new YoutubePlayer(carousel.items)
-        console.log(this.player)
-
+        // this.player = new YoutubePlayer(carousel)
+        // console.log(this.carousel.getVideoPlayer)
+        // console.log(this.player)
         // this.#loadScript(this.#url, window.YT)
         //     .then(() => console.log('YT API Loaded. Youtube embedded is now ready.'))
         // console.log(this.#globalName)
@@ -111,8 +111,9 @@ export class CarouselVideoPlugin {
             this.carousel.setHoverStatus = false
             this.#hovered = false
             console.log('jai demander de pause la video')
+            !this.#hovered ? this.carousel.getVideoPlayer.getPauseVideo : null
             // this.#hovered ? this.player.onPlayerStateChange(this.player) : null
-            !this.#hovered ? this.player.getPauseVideo : null
+            // !this.#hovered && this.carousel.getVideoPlayer ? this.carousel.getVideoPlayer.getPauseVideo : null
             // this.#hovered ? this.player.onPlayerStateChange(this.player) : null
             this.carousel.setPromiseArray = []
             if (this.carousel.getStatus === 'hoveredCompleted') {
@@ -140,8 +141,10 @@ export class CarouselVideoPlugin {
         object.addEventListener(eventToListen, (e) => {
             if (funct && (this.carousel.getStatus !== 'hovered' && this.carousel.getStatus !== 'clicked')) funct(args)
             
+            // this.#hovered ? this.player.getOnPlayerReady() : null
             // this.#hovered ? this.player.onPlayerReady(this.player.events.events.target) : null
-            this.#hovered ? this.player.getOnPlayerReady: null
+            this.carousel.getVideoPlayer && this.#hovered ? this.carousel.getVideoPlayer.getOnPlayerReady: null
+            // this.carousel.getVideoPlayer && this.#hovered ? this.carousel.getVideoPlayer.getOnPlayerReady: null
             // this.#hovered ? this.player.events.events.target.playVideo() : null
 
             this.#eventAction = e.clientX

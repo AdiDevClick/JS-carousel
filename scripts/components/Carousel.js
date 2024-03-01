@@ -1,6 +1,7 @@
 import { createElement, debounce, wait, waitAndFail } from "../functions/dom.js"
 import { CarouselTouchPlugin } from "./CarouselTouchPlugin.js"
 import { CarouselVideoPlugin } from "./CarouselVideoPlugin.js"
+import { YoutubePlayer } from "./YoutubePlayer.js"
 
 export class Carousel 
 {
@@ -55,6 +56,7 @@ export class Carousel
     #myIndex
     #reverseMode = false
     // done = false
+    #player
 
     /**
      * @param {HTMLElement} element 
@@ -101,6 +103,7 @@ export class Carousel
             const item = createElement('div', {class: 'carousel__item'})
             // this.#iFrameCreation()
             item.append(child)
+            // this.#player = new YoutubePlayer(item)
             this.container.append(item)
             return item
         })
@@ -808,5 +811,13 @@ export class Carousel
 
     set setHoverStatus(status) {
         this.#hovered = status
+    }
+
+    get getVideoPlayer() {
+        return this.#player
+    }
+
+    get getIntersectStatus() {
+        return this.#intersect
     }
 }
