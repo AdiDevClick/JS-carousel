@@ -11,7 +11,7 @@ export class CarouselVideoPlugin {
 
     #hovered = false
     #eventAction
-    #player = window.player
+    // #player = window.player
     player
     done = null
     #url = "https://www.youtube.com/iframe_api"

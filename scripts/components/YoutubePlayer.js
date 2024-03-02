@@ -8,6 +8,8 @@ playing = false
 player
 done
 id = []
+videoId
+// eventId = { videoId: this.videoId}
 
 
 events = {
@@ -17,7 +19,10 @@ events = {
     allowfullscreen: '1',
     fullscreen: '1',
     // height: '720',
+    // videoId: 'a8k8R0Q2ubY',
     videoId: this.videoId,
+    // videoId: 'this.videoId',
+    // videoId: `${this.videoId}`,
     playerVars: { 'autoplay': 0, 'controls': 0 , 'enablejsapi': 1, 'modestbranding': 1, 'rel': 0 },
     events: {
         // 'onReady': e => {
@@ -60,9 +65,10 @@ events = {
         carousel.container.querySelectorAll('.player')
             .forEach(element => {
                 const id = element.getAttribute('id')
-                this.id.push('#' + id.split('#')[1])
+                return this.id.push(id)
+                // this.id.push('#' + id.split('#')[1])
             })
-        console.log(this.id)
+        // console.log(this.id)
         // carousel.container.querySelectorAll('id').forEach(element => id = element.getAttribute('id'))
         // console.log(id)
         // const playerId = id
@@ -150,18 +156,57 @@ events = {
         // const player = document.getElementById('player-id')
         // const id = this.id
         if (!this.player) {
+            // console.log(this.id)
             console.log('creation du player')
             this.id.forEach(id => {
-                console.log(id)
-                this.videoId = id
-                this.player = new window.YT.Player('player-id'+id, this.events) 
+                // console.log(id)
+                // this.videoId = id
+                this.player = new YT.Player(id, {
+                    // width: '360',
+                    width: '100%',
+                    height: '100%',
+                    allowfullscreen: '1',
+                    fullscreen: '1',
+                    // height: '720',
+                    // videoId: 'a8k8R0Q2ubY',
+                    videoId: id,
+                    // videoId: 'this.videoId',
+                    // videoId: `${this.videoId}`,
+                    playerVars: { 'autoplay': 0, 'controls': 0 , 'enablejsapi': 1, 'modestbranding': 1, 'rel': 0 },
+                    events: {
+                        // 'onReady': e => {
+                        //     // this.event.push(e)
+                        //     this.event = e
+                        //     this.onPlayerReady(e)
+                        // },
+                        // 'onReady': e => { if (this.video.getHoverStatus) this.onPlayerReady(e) },
+                        // 'onReady': this.onPlayerReady,
+                        'onReady': e => this.onPlayerReady(e),
+                        // 'onPlaybackQualityChange': onPlayerPlaybackQualityChange,
+                        'onStateChange': e => this.onPlayerStateChange(e),
+                        // 'onStateChange': this.onPlayerStateChange,
+                        // 'onStateChange': e => {
+                        //     // this.event.push(e)
+                        //     this.event = e
+                        //     this.onPlayerStateChange(e)
+                        // } ,
+                        // 'onError': onPlayerError
+                    }
+                }) 
+                // this.player = new YT.Player(this.videoId, this.events) 
+                // this.player.push(this.player)
+                // new window.YT.Player('player-id'+id, this.events) 
             })
             // this.player = new window.YT.Player(this.id, this.events) 
             // this.player.push(videoPlayer)
+            // console.log(this.id)
+            // console.log(this.player)
         } else {
             console.log('le player existe deja')
-            return this.player
+            this.player
+            // console.log(this.player)
         }
+        
     }
 
     // 4. The API will call this function when the video player is ready.
@@ -244,6 +289,7 @@ events = {
         console.log('video play')
         if (this.video.getHoverStatus === true) {
         // if (this.isHovered === true) {
+            console.log('play on hover')
             this.player.playVideo()
             this.done  = false
             return e => onPlayerStateChange(e)
@@ -257,6 +303,7 @@ events = {
         console.log('video paused')
         if (this.video.getHoverStatus === false) {
         // if (this.isHovered === false) {
+            console.log('pause not on hover')
             this.player.pauseVideo()
             return e => onPlayerStateChange(e)
         // this.done  = true
