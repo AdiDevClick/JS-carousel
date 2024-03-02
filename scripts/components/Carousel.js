@@ -109,6 +109,8 @@ export class Carousel
             // new YoutubePlayer(child)
             return item
         })
+        new YoutubePlayer(this)
+        
         // children.forEach(child => {
         //     let item = createElement('div', {class: 'carousel__item'})
         //         item.append(child)
@@ -162,7 +164,7 @@ export class Carousel
             new CarouselVideoPlugin(this)
         }
 
-        new YoutubePlayer(this)
+        
         new CarouselTouchPlugin(this)
     }
 

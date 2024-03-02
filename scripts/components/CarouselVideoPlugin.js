@@ -37,7 +37,6 @@ export class CarouselVideoPlugin {
             }
             
         })
-
         // this.player = new YoutubePlayer(this.carousel)
         // console.log(this.carousel.getVideoPlayer)
         // console.log(this.player)
