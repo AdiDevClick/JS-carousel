@@ -150,6 +150,7 @@ export class CarouselVideoPlugin {
             this.carousel.setPromiseArray = []
             // console.log('click status dans le debounce : ', this.carousel.getClickStatus)
             this.carousel.getClickStatus ? this.carousel.setHoverStatus = false : this.carousel.setHoverStatus = true
+            console.log('hover status : ' + this.getHoverStatus, 'carousel hover status : ' + this.carousel.getHoverStatus)
             this.carousel.getClickStatus ? this.#hovered = false : this.#hovered = true
             // console.log('hover status dans le debounce : ', this.carousel.getHoverStatus)
             let newEvent = new CustomEvent(`${customEvent}`, {
