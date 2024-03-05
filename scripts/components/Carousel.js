@@ -56,7 +56,7 @@ export class Carousel
     #myIndex
     #reverseMode = false
     // done = false
-    #player
+    #player = []
 
     /**
      * @param {HTMLElement} element 
@@ -101,16 +101,19 @@ export class Carousel
         this.element.append(this.root)
         this.items = children.map(child => {
             const item = createElement('div', {class: 'carousel__item'})
-            // this.#iFrameCreation()
-            item.append(child)
             // this.#player = new YoutubePlayer(item)
+            // this.#iFrameCreation()
+            // console.log(item)
+            // this.#player = new YoutubePlayer(child)
+            item.append(child)
+            
             
             this.container.append(item)
             // new YoutubePlayer(child)
             return item
         })
-        new YoutubePlayer(this)
-        
+        this.#player = new YoutubePlayer(this)
+        // console.log(this.#player)
         // children.forEach(child => {
         //     let item = createElement('div', {class: 'carousel__item'})
         //         item.append(child)
@@ -163,9 +166,11 @@ export class Carousel
             // this.#showLoadingBar()
             new CarouselVideoPlugin(this)
         }
+        // this.#player = new YoutubePlayer(this.container)
 
-        
         new CarouselTouchPlugin(this)
+
+        // console.log(this.#player)
     }
 
     #iFrameCreation() {

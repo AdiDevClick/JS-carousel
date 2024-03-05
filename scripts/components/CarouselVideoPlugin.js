@@ -25,19 +25,22 @@ export class CarouselVideoPlugin {
         // this.#player = window
         // console.log("status du clic en debut de plugin : ",carousel.getClickStatus) 
         carousel.items.forEach(item => {
-            // this.player = new YoutubePlayer(item)
+            // console.log(this.player)
+            // this.player = item.querySelector('.player')
+            // if (this.player) this.videoPlayer = new YoutubePlayer(item)
+
             if (carousel.getClickStatus !== true || carousel.getStatus !== 'clicked') {
 
                 this.#createEventListenerFromMouse(item, 'mouseover' , 'mouseDebounce', false, this.#onHover.bind(this))
                 // this.#createEventListenerFromMouse(item, 'touchstart' , 'mouseDebounce', false, this.#onHover.bind(this))
                 this.#debounceMouse(item, 'mouseDebounce')
                 item.addEventListener('mouseout', e => this.#onPointerOut(e))
-                
                 // this.item = item
             }
             
         })
-        // this.player = new YoutubePlayer(this.carousel)
+
+        // this.player = new YoutubePlayer(carousel.container)
         // console.log(this.carousel.getVideoPlayer)
         // console.log(this.player)
         // this.#loadScript(this.#url, window.YT)
@@ -111,6 +114,7 @@ export class CarouselVideoPlugin {
             this.#hovered = false
             console.log('jai demander de pause la video')
             !this.#hovered ? this.carousel.getVideoPlayer.getPauseVideo : null
+            // !this.#hovered ? this.carousel.getVideoPlayer.getPauseVideo : null
             // this.#hovered ? this.player.onPlayerStateChange(this.player) : null
             // !this.#hovered && this.carousel.getVideoPlayer ? this.carousel.getVideoPlayer.getPauseVideo : null
             // this.#hovered ? this.player.onPlayerStateChange(this.player) : null
@@ -142,7 +146,8 @@ export class CarouselVideoPlugin {
             
             // this.#hovered ? this.player.getOnPlayerReady() : null
             // this.#hovered ? this.player.onPlayerReady(this.player.events.events.target) : null
-            this.carousel.getVideoPlayer && this.#hovered ? this.carousel.getVideoPlayer.getOnPlayerReady: null
+            // console.log(this.player)
+            // this.player && this.#hovered ? this.player.getOnPlayerReady : null
             // this.carousel.getVideoPlayer && this.#hovered ? this.carousel.getVideoPlayer.getOnPlayerReady: null
             // this.#hovered ? this.player.events.events.target.playVideo() : null
 
@@ -150,13 +155,17 @@ export class CarouselVideoPlugin {
             this.carousel.setPromiseArray = []
             // console.log('click status dans le debounce : ', this.carousel.getClickStatus)
             this.carousel.getClickStatus ? this.carousel.setHoverStatus = false : this.carousel.setHoverStatus = true
-            console.log('hover status : ' + this.getHoverStatus, 'carousel hover status : ' + this.carousel.getHoverStatus)
-            this.carousel.getClickStatus ? this.#hovered = false : this.#hovered = true
+            
+            this.carousel.getClickStatus ? this.setHoverStatus = false : this.setHoverStatus = true
+            console.log('item hover status : ' + object.getHoverStatus + ' hover status : ' + this.getHoverStatus, 'carousel hover status : ' + this.carousel.getHoverStatus)
+            // this.carousel.getClickStatus ? this.this.#hovered = false : this.#hovered = true
+            // this.carousel.getClickStatus ? this.this.#hovered = false : this.#hovered = true
             // console.log('hover status dans le debounce : ', this.carousel.getHoverStatus)
             let newEvent = new CustomEvent(`${customEvent}`, {
-                bubbles: false,
-                detail: e
+                bubbles: true,
+                detail: {e, object}
             }, {once: true})
+            // console.log(object)
             object.dispatchEvent(newEvent)
 
             animationDelay ? this.carousel.getAnimationDelay : null
@@ -178,7 +187,7 @@ export class CarouselVideoPlugin {
                 this.carousel.setScrollingStatus = false
                 return
             }
-            const mouseEvent = e.detail
+            const mouseEvent = e.detail.e
             let X = mouseEvent.clientX
             let Y = mouseEvent.clientY
             let mousePosition = X
@@ -263,6 +272,10 @@ export class CarouselVideoPlugin {
 
     get getHoverStatus() {
         return this.#hovered
+    }
+
+    set setHoverStatus(status) {
+        return this.#hovered = status
     }
 
     get getDoneStatus() {
