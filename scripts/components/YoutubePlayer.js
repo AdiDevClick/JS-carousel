@@ -77,16 +77,21 @@ video = []
         //     this.player = new YoutubeDisplayPlayer(player)
         // })
 
+        console.log(this.player)
+
         // console.log(this.carousel.container.player)
-        const test = this.carousel.container.querySelector('.player')
-        console.log(test)
+        // const test = this.carousel.container.querySelector('.player')
+        // console.log(test)
 
         
 
         this.carousel.items.forEach(item => {
-            // console.log(item)
-            this.#createEventListenerFromHover(item , 'mouseover' , 'videoplay', this.player.onHover(item))
-            this.#createEventListenerFromHover(item , 'mouseout' , 'videopause', this.player.onPointerOut(item))
+            const foundPlayer = item.querySelector('.player')
+
+            if (foundPlayer) {
+                this.#createEventListenerFromHover(item , 'mouseover' , 'videoplay', this.player.onHover(item))
+                this.#createEventListenerFromHover(item , 'mouseout' , 'videopause', this.player.onPointerOut(item))
+            }
             // item.addEventListener('videoplay', (e) => {
             //     console.log(e)
             //     console.log('customeventdsqdssssssssssssssssssssssssssssssssssssssssssssssssssssss')
@@ -295,22 +300,73 @@ class YoutubeDisplayPlayer
 
     videoPlayer = []
     players = []
+    player = []
+    event = []
 
     constructor(container) {
         this.container = container
 
         // const test = container.querySelector('.player')
         //     console.log(test)
+        
+        // this.player = Array.from(this.container.querySelectorAll('.player'))
+        // // console.log(containers)
+        // this.player.forEach(element => {
+        //     // const container = element.querySelectorAll('.player')
+        //     // this.player = element
+        //     // this.player.push(element)
+        //     element.addEventListener('mouseover', e => this.onHover(e))
+        //     // const test = element.querySelector('.player')
+        // })
+
+
         const containers = this.container.querySelectorAll('.player')
-        console.log(containers)
-        containers.forEach(element => {
-            const container = element.querySelectorAll('.player')
-            this.player = container
+        
+        for (const container of containers) {
+            // if (this.player.id) {
+            //     this.player.id = container.id
+            //     console.log(this.player)
+            // } else {
+            //     this.player.id = container.id
+            //     console.log(this.player)
+            // }
+            // this.player.id = container.id
+            // this.player[container.id] = container
+            // this.player.push(
+            //     // this.player.element = container,
+            //     // this.player[container.id] = container
+            // )
+            this.player[container.id] = {
+                element: container, 
+                id: container.id
+            }
+            // this.player.element = container,
+            // this.player[element.id] = container
+            // this.player[container.id] = container
+            
+            
+            // this.player.push({
+            //     element : container,
+            //     id : container.id
+            // })
             window.onYouTubeIframeAPIReady = this.onYouTubeIframeAPIReady.bind(this)
 
-            // const test = element.querySelector('.player')
-        })
+        }
+        console.log(this.player)
+        
 
+        // for (const container of containers) {
+        //     // this.player = []
+        //     this.player.push([
+        //         this.player.element = container,
+        //         this.player[container] = container.id
+        //     ])
+        // }
+
+        // this.player.forEach(element => {
+        //     console.log(element.element)
+        // })
+        
 
 
         // this.id = player.id
@@ -326,12 +382,15 @@ class YoutubeDisplayPlayer
         // console.log(this.ids)
         
         // this.id.push(id)
-
-        console.log(this.id)
         // this.id.push(player.id)
 
-
-
+        // for (const player of this.player) {
+        //     // console.log(player)
+        //     this.player.push([
+        //         this.player[player] = 'test'
+        //     ])
+        // }
+        // console.log(this.player)
         // window.onYouTubeIframeAPIReady = this.onYouTubeIframeAPIReady.bind(this)
         // e => this.onYouTubeIframeAPIReady.bind(this)
         // this.onYouTubeIframeAPIReady()
@@ -390,29 +449,24 @@ class YoutubeDisplayPlayer
      */
     onHover(element) {
         const foundPlayer = element.querySelector('.player')
-        // console.log(element)
-        console.log(foundPlayer)
         if(foundPlayer) {
             element.addEventListener('videoplay', (e) => {
-                
-                const player = e.detail.object.querySelector('.player')
-                // if (player.id === this.videoPlayer.id) {
-                    console.log(player.id)
-                    console.log(this.event.target)
-                    
-                    this.event.target.playVideo()
-                    // this.onPlayerReady(this.videoPlayer)
-                    // this.playVideo.bind(this)
+                // const elem = e.detail.object.querySelector('.player').id
+                const elem = foundPlayer.id
+                if (this.player[elem].event.data !== YT.PlayerState.PLAYING) {
+                    // if (player.id === this.videoPlayer.id) {
+                    this.player[elem].event.target.playVideo()
+                    // this.player[elem].player.playVideo()
                 }
-            )
-        // } else {
-            // return null
+                return 
+            })
         }
-        // return null
+        return null
     }
 
-    getVideoPlayerById(videoPlayerId, playerId) {
-        if (playerId === videoPlayerId) {
+    getVideoPlayerById(id, playerId) {
+        if (playerId === id) {
+
             this.playVideo()
         } else {
 
@@ -424,12 +478,27 @@ class YoutubeDisplayPlayer
      * @param {PointerEvent} e 
      */
     onPointerOut(element) {
+        const foundPlayer = element.querySelector('.player')
+        // console.log(foundPlayer)
+        if(foundPlayer) {
+            element.addEventListener('videopause', (e) => {
+                // const elem = e.detail.object.querySelector('.player').id
+                const elem = foundPlayer.id
+                if (this.player[elem].event.data === YT.PlayerState.PLAYING) {
+                    // if (player.id === this.videoPlayer.id) {
+                    this.player[elem].event.target.pauseVideo()
+                    // this.player[elem].player.playVideo()
+                }
+                return 
+            })
+        }
+        return null
         // console.log(element)
         // console.log('jai demander de pause la video')
-        this.container.addEventListener('videopause', (e) => {
+        // this.container.addEventListener('videopause', (e) => {
             // console.log(e)
             // console.log('je de hover')
-        })
+        // })
         // element.pauseVideo()
         // this.pauseVideo()
         // !this.hovered ? this.carousel.getVideoPlayer.getPauseVideo : null
@@ -451,10 +520,36 @@ class YoutubeDisplayPlayer
         // }
         // console.log(embedCode)
         // this.event.push(e)
+        // 
         console.log('je suis dans oinplyer')
-        this.event = event
+        console.log(event)
+        // this.event.push(event)
+
+        // const test = this.player.id
+        // this.videoPlayer.event = event
+        // this.player.video = event
+        this.videoPlayer.push({
+            'this.player.id' : event
+        })
+
+        // console.log(event.target.o.id)
+
+        // this.player[element].event = Array.from(this.event)
+
+
+        this.player[event.target.o.id].event = event
+
+
+        // this.player.forEach(element => {
+        //     console.log('test3')
+            
+        // })
+        
+        // test.push(...event)
+        console.log(this.videoPlayer)
         console.log(this.event)
-        console.log(this.players)
+        console.log(this.player)
+        console.log(this.player.video)
         // event.target.playVideo()
         // console.log(e)
         // e.target.playVideo()
@@ -463,7 +558,7 @@ class YoutubeDisplayPlayer
         if (event.data !== YT.PlayerState.PLAYING) {
             
                 // console.log(e)
-                this.event = event
+                // this.event = event
                 this.done = false
                 // this.onPlayerStateChange()
                 
@@ -494,8 +589,11 @@ class YoutubeDisplayPlayer
         // if (this.done) return this.onPlayerReady(event)
         //     return e => onPlayerStateChange(e)
         console.log('je suis dans le playerstate')
-        this.event = event
+        // this.event = event
+        // console.log(event)
         console.log(this.event)
+        this.player[event.target.o.id].event = event
+
             // console.log(this.video.getHoverStatus)
         // }
         // console.log('event du plyers state : ' + event + event.data + this.event)
@@ -564,119 +662,26 @@ class YoutubeDisplayPlayer
     }
 
     onYouTubeIframeAPIReady() {
-        // // this.getPlayId
-        // console.log(this.player)
-        // console.log(this.id)
-        // this.video.addEventListener('videocheck', (e) => {
-        //     const player = e.detail.object.querySelector('.player')
-        //     // this.id = player.getAttribute('id')
-        //     console.log('je check lid')
-        //     console.log(player)
-        //     console.log(this.id)
-        //     // const id = player.getAttribute('id')
-        // })
-        // const player = object.querySelector('.player')
-        // const id = player.getAttribute('id')
-        // if (!this.videoPlayer && player) {
-            // console.log(this.player)
-            // console.log(this.id)
-            console.log('creation du player')
-            const containers = this.container.querySelectorAll('.player')
-            // console.log(this.id)
-            containers.forEach(container => {
-            // this.id.forEach(id => {
-
-
-
-            //     // console.log(id)
-            //     // this.videoId = id
-                // if (this.player) {
-                        // this.videoPlayer = new YT.Player(container.id, {
-                        this.videoPlayer.push(new window.YT.Player(container.id, {
-                        // width: '360',
-                        width: '100%',
-                        height: '100%',
-                        allowfullscreen: '1',
-                        fullscreen: '1',
-                        // height: '720',
-                        videoId: container.id,
-                        playerVars: { 'autoplay': 0, 'controls': 0 , 'enablejsapi': 1, 'modestbranding': 1, 'rel': 0 },
-                        events: {
-                            'onReady': this.onPlayerReady.bind(this),
-                            // 'onReady': e => this.onPlayerReady(e),
-                            // 'onPlaybackQualityChange': onPlayerPlaybackQualityChange,
-                            'onStateChange': this.onPlayerStateChange.bind(this),
-                            'onError': this.onPlayerError.bind(this)
-                        }
-                        }))
-                    
-                // } 
-                // this.videoPlayer.forEach(element => {
-                //     element.id = container.id
-                // })
-                // this.videoPlayer.id = container.id
-
-                // this.players.push(this.videoPlayer)
-                console.log(this.videoPlayer)
-                // console.log(this.videoPlayer.id[1])
-                // if (this.videoPlayer.g.id !== this.player.id) {
-                //     console.log('object')
-                //     this.videoPlayer = new YT.Player(this.player.id, {
-                //         // width: '360',
-                //         width: '100%',
-                //         height: '100%',
-                //         allowfullscreen: '1',
-                //         fullscreen: '1',
-                //         // height: '720',
-                //         videoId: this.player.id,
-                //         playerVars: { 'autoplay': 0, 'controls': 0 , 'enablejsapi': 1, 'modestbranding': 1, 'rel': 0 },
-                //         // events: {
-                //         //     'onReady': this.onPlayerReady.bind(this),
-                //         //     // 'onPlaybackQualityChange': onPlayerPlaybackQualityChange,
-                //         //     'onStateChange': this.onPlayerStateChange.bind(this),
-                //         //     'onError': this.onPlayerError.bind(this)
-                //         // }
-                //     }) 
-                // }
+        console.log('creation du player')
+        for (const container in this.player) {
+            const player = new YT.Player(container, {
+                // width: '360',
+                width: '100%',
+                height: '100%',
+                allowfullscreen: '1',
+                fullscreen: '1',
+                // height: '720',
+                videoId: container,
+                playerVars: { 'autoplay': 0, 'controls': 0 , 'enablejsapi': 1, 'modestbranding': 1, 'rel': 0 },
+                events: {
+                    'onReady': this.onPlayerReady.bind(this),
+                    'onStateChange': this.onPlayerStateChange.bind(this),
+                    'onError': this.onPlayerError.bind(this)
+                }
             })
-
-            
-            // console.log(players)
-            // this.carousel.getVideoPlayer && this.#hovered ? this.carousel.getVideoPlayer.getOnPlayerReady: null
-
-
-            // this.hoverPlugin.addEventListener('mouseDebounce', (e) => {
-            //     const player = e.detail.object.querySelector('.player')
-            //     if (player) {
-            //         this.videoPlayer = new YT.Player(player.getAttribute('id'), {
-            //             // width: '360',
-            //             width: '100%',
-            //             height: '100%',
-            //             allowfullscreen: '1',
-            //             fullscreen: '1',
-            //             // height: '720',
-            //             videoId: player.getAttribute('id'),
-            //             playerVars: { 'autoplay': 0, 'controls': 0 , 'enablejsapi': 1, 'modestbranding': 1, 'rel': 0 },
-            //             events: {
-            //                 'onReady': e => this.onPlayerReady(e),
-            //                 // 'onPlaybackQualityChange': onPlayerPlaybackQualityChange,
-            //                 'onStateChange': this.onPlayerStateChange.bind(this),
-            //                 'onError': this.onPlayerError.bind(this)
-            //             }
-            //         }) 
-            //     // console.log(e.detail.object.querySelector('.player').getAttribute('id'))
-            //     }
-            //     // return this.videoPlayer
-            // })
-        // console.log(this.videoPlayer)
-        
-
-        // } else {
-        //     // console.log('le player existe deja')
-        //     // this.player.bind(this)
-        //     // return
-        // }
-        // console.log(this.player)
+            // this.player[container].player = {...player}
+            this.player[container].player = player
+        }
     }
 }
 

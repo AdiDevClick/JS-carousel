@@ -112,7 +112,6 @@ export class Carousel
             // new YoutubePlayer(child)
             return item
         })
-        this.#player = new YoutubePlayer(this)
         // console.log(this.#player)
         // children.forEach(child => {
         //     let item = createElement('div', {class: 'carousel__item'})
@@ -167,6 +166,7 @@ export class Carousel
             new CarouselVideoPlugin(this)
         }
         // this.#player = new YoutubePlayer(this.container)
+        this.#player = new YoutubePlayer(this)
 
         new CarouselTouchPlugin(this)
 
