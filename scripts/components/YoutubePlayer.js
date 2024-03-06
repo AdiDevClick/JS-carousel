@@ -1,301 +1,301 @@
 import { Carousel } from "./Carousel.js"
 import { CarouselVideoPlugin } from "./CarouselVideoPlugin.js"
 
-export class YoutubePlayer {
+// export class YoutubePlayer {
 
-hovered = false
-event
-playing = false
-player = []
-videoPlayer = []
-item = []
-done = true
-// id 
-videoId
-video = []
-// isHovered
+// hovered = false
+// event
+// playing = false
+// player = []
+// videoPlayer = []
+// item = []
+// done = true
+// // id 
+// videoId
+// video = []
+// // isHovered
 
 
-// events = {
-//     // width: '360',
-//     width: '100%',
-//     height: '100%',
-//     allowfullscreen: '1',
-//     fullscreen: '1',
-//     // height: '720',
-//     // videoId: 'a8k8R0Q2ubY',
-//     videoId: this.videoId,
-//     // videoId: 'this.videoId',
-//     // videoId: `${this.videoId}`,
-//     playerVars: { 'autoplay': 0, 'controls': 0 , 'enablejsapi': 1, 'modestbranding': 1, 'rel': 0 },
-//     events: {
-//         // 'onReady': e => {
-//         //     // this.event.push(e)
-//         //     this.event = e
-//         //     this.onPlayerReady(e)
-//         // },
-//         // 'onReady': e => { if (this.video.getHoverStatus) this.onPlayerReady(e) },
-//         // 'onReady': this.onPlayerReady,
-//         'onReady': e => this.onPlayerReady(e),
-//         // 'onPlaybackQualityChange': onPlayerPlaybackQualityChange,
-//         'onStateChange': e => this.onPlayerStateChange(e),
-//         // 'onStateChange': this.onPlayerStateChange,
-//         // 'onStateChange': e => {
-//         //     // this.event.push(e)
-//         //     this.event = e
-//         //     this.onPlayerStateChange(e)
-//         // } ,
-//         // 'onError': onPlayerError
+// // events = {
+// //     // width: '360',
+// //     width: '100%',
+// //     height: '100%',
+// //     allowfullscreen: '1',
+// //     fullscreen: '1',
+// //     // height: '720',
+// //     // videoId: 'a8k8R0Q2ubY',
+// //     videoId: this.videoId,
+// //     // videoId: 'this.videoId',
+// //     // videoId: `${this.videoId}`,
+// //     playerVars: { 'autoplay': 0, 'controls': 0 , 'enablejsapi': 1, 'modestbranding': 1, 'rel': 0 },
+// //     events: {
+// //         // 'onReady': e => {
+// //         //     // this.event.push(e)
+// //         //     this.event = e
+// //         //     this.onPlayerReady(e)
+// //         // },
+// //         // 'onReady': e => { if (this.video.getHoverStatus) this.onPlayerReady(e) },
+// //         // 'onReady': this.onPlayerReady,
+// //         'onReady': e => this.onPlayerReady(e),
+// //         // 'onPlaybackQualityChange': onPlayerPlaybackQualityChange,
+// //         'onStateChange': e => this.onPlayerStateChange(e),
+// //         // 'onStateChange': this.onPlayerStateChange,
+// //         // 'onStateChange': e => {
+// //         //     // this.event.push(e)
+// //         //     this.event = e
+// //         //     this.onPlayerStateChange(e)
+// //         // } ,
+// //         // 'onError': onPlayerError
+// //     }
+// // }
+// // done = false
+// // #url = "https://www.youtube.com/iframe_api"
+// // #globalName = window.YT
+
+//     /**
+//      * @param {Carousel} carousel
+//      */
+//     constructor(carousel) {
+//         this.carousel = carousel
+//         this.videoContainer = carousel.container
+//         // this.isHovered = carousel.getHoverStatus
+//         // this.item = carousel
+
+//         this.#iFrameCreation()
+
+//         // const container = this.videoContainer.querySelectorAll('.player')
+//         this.player = new YoutubeDisplayPlayer(this.videoContainer)
+
+//         // for (let index = 0; index < container.length; index++) {
+//         //     const element = container[index]
+//         //     this.player[index] = new YoutubeDisplayPlayer(element)
+//         // }
+
+//         // this.videoContainer.querySelectorAll('.player').forEach(player => {
+//         //     // window.onYouTubeIframeAPIReady = new YoutubeDisplayPlayer(player)
+//         //     // this.id.push(player.getAttribute('id'))
+//         //     this.player = new YoutubeDisplayPlayer(player)
+//         // })
+
+//         console.log(this.player)
+
+//         // console.log(this.carousel.container.player)
+//         // const test = this.carousel.container.querySelector('.player')
+//         // console.log(test)
+
+        
+
+//         this.carousel.items.forEach(item => {
+//             const foundPlayer = item.querySelector('.player')
+
+//             if (foundPlayer) {
+//                 this.#createEventListenerFromHover(item , 'mouseover' , 'videoplay', this.player.onHover(item))
+//                 this.#createEventListenerFromHover(item , 'mouseout' , 'videopause', this.player.onPointerOut(item))
+//             }
+//             // item.addEventListener('videoplay', (e) => {
+//             //     console.log(e)
+//             //     console.log('customeventdsqdssssssssssssssssssssssssssssssssssssssssssssssssssssss')
+//             // })
+//         })
+        
+//         // console.log(this.player)
+//         // if (this.player) 
+//         // console.log(this.carousel)
+//         // console.log(this.item)
+//         // this.id = item.getElementById('player-id')
+//         // carousel.items.forEach(item => {
+//         //     this.id = item.getElementById('player-id')
+//         // })
+//         // let id
+//         // carousel.container.querySelectorAll('.player')
+//         //     .forEach(element => 
+//         //         this.id = element.getAttribute('id').split('#')[1]
+//         //     )
+
+
+//         // const players = this.carousel.querySelectorAll('.player')
+//         // if (players) {
+//         //     players.forEach(player => {
+//         //         const id = player.getAttribute('id')
+//         //         this.id.push(id)
+//         //         console.log(player)
+//         //         player.addEventListener('mouseDebounce', (e) => {
+//         //             console.log(e)
+//         //             let test = e.detail.object
+//         //             console.log(test)
+//         //             console.log('test')
+//         //         })
+//         //         // this.id.push('#' + id.split('#')[1])
+//         //     })
+//         // }
+        
+//         // this.carousel.querySelectorAll('.player').forEach(player => {
+            
+//         // })
+
+
+//         // players ? console.log(this.id) : console.log('object')
+        
+//         // carousel.container.querySelectorAll('id').forEach(element => id = element.getAttribute('id'))
+//         // console.log(id)
+//         // const playerId = id
+//         // console.log(playerId)
+//         // this.id = '#' + id.split('#')[1]
+//         // console.log(target)
+//         // if (playerId.startsWith('#')) {
+//         // modal = document.querySelector(href)
+//         // if (String.startsBy('player'))
+        
+//         // carousel.element.querySelectorAll(target).forEach(id => {
+//         //     this.id = id
+//         // })
+        
+        
+//         // this.#loadScript(this.#url, this.#globalName)
+//         //     .then(() => console.log('YT API Loaded. Youtube embedded is now ready.'))
+
+//         // window.onYouTubeIframeAPIReady = e => this.loadVideo(e)
+//         // this.video = items
+        
+//         // console.log(carousel)
+//         // this.#loadScript()
+//         // this.onYouTubeIframeAPIReady()
 //     }
+
+//     #iFrameCreation() {
+//         const iframe = document.getElementById('videoIFrame')
+
+//         if (!iframe) {
+//             const tag = document.createElement('script')
+
+//             tag.src = 'https://www.youtube.com/iframe_api'
+//             tag.setAttribute('id', 'videoIFrame')
+//             tag.type = 'text/javascript'
+//             // tag.loading = 'lazy'
+//             tag.referrerPolicy = 'no-referrer'
+//             // tag.type =  'image/svg+xml'
+//             // console.log('object')
+//             // window.onYouTubeIframeAPIReady = this.loadVideo.bind(this)
+            
+            
+//             // this.done = window.done
+//             const firstScriptTag = document.getElementsByTagName('script')[0]
+//             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+//         } else {
+//             // this.loadVideo.bind(this)
+//             e => this.loadVideo(e)
+//             // this.loadVideo()
+//             // console.log(e)
+//         }
+//     }
+
+//     #createEventListenerFromHover(object, eventToListen , customEvent, funct = null, args = null) {
+//         object.addEventListener(eventToListen, (e) => {
+//             if (funct) funct(args)
+//             // console.log('je test mon eventcreateur')
+//             let newEvent = new CustomEvent(`${customEvent}`, {
+//                 bubbles: true,
+//                 detail: {e, object}
+//             }, {once: true})
+
+//             object.dispatchEvent(newEvent)
+//         })
+//     }
+
+//     // #loadScript(scriptUrl, globalName) {
+//     //     if (globalName && window[globalName]) return Promise.resolve()
+
+//     //     return new Promise((resolve, reject) => {
+//     //         // const iframe = document.getElementById('videoIFrame')
+            
+//     //         if (!this.#globalName) { 
+//     //             let scr = document.createElement('script')
+//     //             scr.type = "text/javascript"
+//     //             scr.setAttribute('id', 'videoIFrame')
+//     //             // scr.setAttribute('async', '')
+//     //             scr.src = scriptUrl
+//     //             // document.getElementsByTagName('head')[0].appendChild(scr)
+//     //             const firstScriptTag = document.getElementsByTagName('script')[0]
+//     //             firstScriptTag.parentNode.insertBefore(scr, firstScriptTag)
+
+                
+
+//     //             scr.onload = (() => {
+//     //                 !globalName || window[globalName] ?
+//     //                 resolve(window.onYouTubeIframeAPIReady = e => this.loadVideo(e)) :
+//     //                 reject(Error('window.' + globalName + ' undefined'))
+//     //             })
+
+//     //             scr.onerror = () => reject(Error('Error loading ' + globalName||scriptUrl))
+                
+//     //         } else {
+//     //             e => this.loadVideo(e)
+//     //         }
+//     //     })
+//     // }
+
+// // 3. This function creates an <iframe> (and YouTube player)
+// //    after the API code downloads.
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+//     // get getOnPlayerReady() {
+//     //     // console.log('je suis dans le getter, voici le player : ' +this.player + this.event.target)
+//     //     // if (this.player) {
+//     //         // console.log('jai utiliser mon play getter')
+//     //         // return this.loadVideo(this.event)
+//     //         // return this.event.target.playVideo()
+//     //         return this.onPlayerReady(this.event[0])
+//     //     // }
+//     // }
+
+//     // get getPlayerEvent() {
+//     //     return this.event
+//     // }
+
+    
+
+//     // get getStopVideo() {
+//     //     // if (this.player) {
+//     //         console.log(this.player)
+//     //         let playEvent = this.getPlayerEvent
+//     //         console.log('jai utiliser mon stop getter')
+//     //         // this.stopVideo(this.event)
+//     //         this.stopVideo(playEvent)
+//     //         // this.stopVideo.bind(this)
+//     //     // }
+//     // }
+
+//     // get getPauseVideo() {
+//     //     // if (this.player) {
+//     //         console.log(this.videoPlayer)
+//     //         let playEvent = this.getPlayerEvent
+
+//     //         console.log('jai utiliser mon pause getter')
+//     //         // this.pauseVideo.bind(this)
+//     //         // this.pauseVideo(this.event)
+//     //         this.pauseVideo(playEvent)
+//     //         // this.pauseVideo()
+//     //     // }
+//     // }
 // }
-// done = false
-// #url = "https://www.youtube.com/iframe_api"
-// #globalName = window.YT
 
-    /**
-     * @param {Carousel} carousel
-     */
-    constructor(carousel) {
-        this.carousel = carousel
-        this.videoContainer = carousel.container
-        // this.isHovered = carousel.getHoverStatus
-        // this.item = carousel
-
-        this.#iFrameCreation()
-
-        // const container = this.videoContainer.querySelectorAll('.player')
-        this.player = new YoutubeDisplayPlayer(this.videoContainer)
-
-        // for (let index = 0; index < container.length; index++) {
-        //     const element = container[index]
-        //     this.player[index] = new YoutubeDisplayPlayer(element)
-        // }
-
-        // this.videoContainer.querySelectorAll('.player').forEach(player => {
-        //     // window.onYouTubeIframeAPIReady = new YoutubeDisplayPlayer(player)
-        //     // this.id.push(player.getAttribute('id'))
-        //     this.player = new YoutubeDisplayPlayer(player)
-        // })
-
-        console.log(this.player)
-
-        // console.log(this.carousel.container.player)
-        // const test = this.carousel.container.querySelector('.player')
-        // console.log(test)
-
-        
-
-        this.carousel.items.forEach(item => {
-            const foundPlayer = item.querySelector('.player')
-
-            if (foundPlayer) {
-                this.#createEventListenerFromHover(item , 'mouseover' , 'videoplay', this.player.onHover(item))
-                this.#createEventListenerFromHover(item , 'mouseout' , 'videopause', this.player.onPointerOut(item))
-            }
-            // item.addEventListener('videoplay', (e) => {
-            //     console.log(e)
-            //     console.log('customeventdsqdssssssssssssssssssssssssssssssssssssssssssssssssssssss')
-            // })
-        })
-        
-        // console.log(this.player)
-        // if (this.player) 
-        // console.log(this.carousel)
-        // console.log(this.item)
-        // this.id = item.getElementById('player-id')
-        // carousel.items.forEach(item => {
-        //     this.id = item.getElementById('player-id')
-        // })
-        // let id
-        // carousel.container.querySelectorAll('.player')
-        //     .forEach(element => 
-        //         this.id = element.getAttribute('id').split('#')[1]
-        //     )
-
-
-        // const players = this.carousel.querySelectorAll('.player')
-        // if (players) {
-        //     players.forEach(player => {
-        //         const id = player.getAttribute('id')
-        //         this.id.push(id)
-        //         console.log(player)
-        //         player.addEventListener('mouseDebounce', (e) => {
-        //             console.log(e)
-        //             let test = e.detail.object
-        //             console.log(test)
-        //             console.log('test')
-        //         })
-        //         // this.id.push('#' + id.split('#')[1])
-        //     })
-        // }
-        
-        // this.carousel.querySelectorAll('.player').forEach(player => {
-            
-        // })
-
-
-        // players ? console.log(this.id) : console.log('object')
-        
-        // carousel.container.querySelectorAll('id').forEach(element => id = element.getAttribute('id'))
-        // console.log(id)
-        // const playerId = id
-        // console.log(playerId)
-        // this.id = '#' + id.split('#')[1]
-        // console.log(target)
-        // if (playerId.startsWith('#')) {
-        // modal = document.querySelector(href)
-        // if (String.startsBy('player'))
-        
-        // carousel.element.querySelectorAll(target).forEach(id => {
-        //     this.id = id
-        // })
-        
-        
-        // this.#loadScript(this.#url, this.#globalName)
-        //     .then(() => console.log('YT API Loaded. Youtube embedded is now ready.'))
-
-        // window.onYouTubeIframeAPIReady = e => this.loadVideo(e)
-        // this.video = items
-        
-        // console.log(carousel)
-        // this.#loadScript()
-        // this.onYouTubeIframeAPIReady()
-    }
-
-    #iFrameCreation() {
-        const iframe = document.getElementById('videoIFrame')
-
-        if (!iframe) {
-            const tag = document.createElement('script')
-
-            tag.src = 'https://www.youtube.com/iframe_api'
-            tag.setAttribute('id', 'videoIFrame')
-            tag.type = 'text/javascript'
-            // tag.loading = 'lazy'
-            tag.referrerPolicy = 'no-referrer'
-            // tag.type =  'image/svg+xml'
-            // console.log('object')
-            // window.onYouTubeIframeAPIReady = this.loadVideo.bind(this)
-            
-            
-            // this.done = window.done
-            const firstScriptTag = document.getElementsByTagName('script')[0]
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
-        } else {
-            // this.loadVideo.bind(this)
-            e => this.loadVideo(e)
-            // this.loadVideo()
-            // console.log(e)
-        }
-    }
-
-    #createEventListenerFromHover(object, eventToListen , customEvent, funct = null, args = null) {
-        object.addEventListener(eventToListen, (e) => {
-            if (funct) funct(args)
-            // console.log('je test mon eventcreateur')
-            let newEvent = new CustomEvent(`${customEvent}`, {
-                bubbles: true,
-                detail: {e, object}
-            }, {once: true})
-
-            object.dispatchEvent(newEvent)
-        })
-    }
-
-    // #loadScript(scriptUrl, globalName) {
-    //     if (globalName && window[globalName]) return Promise.resolve()
-
-    //     return new Promise((resolve, reject) => {
-    //         // const iframe = document.getElementById('videoIFrame')
-            
-    //         if (!this.#globalName) { 
-    //             let scr = document.createElement('script')
-    //             scr.type = "text/javascript"
-    //             scr.setAttribute('id', 'videoIFrame')
-    //             // scr.setAttribute('async', '')
-    //             scr.src = scriptUrl
-    //             // document.getElementsByTagName('head')[0].appendChild(scr)
-    //             const firstScriptTag = document.getElementsByTagName('script')[0]
-    //             firstScriptTag.parentNode.insertBefore(scr, firstScriptTag)
-
-                
-
-    //             scr.onload = (() => {
-    //                 !globalName || window[globalName] ?
-    //                 resolve(window.onYouTubeIframeAPIReady = e => this.loadVideo(e)) :
-    //                 reject(Error('window.' + globalName + ' undefined'))
-    //             })
-
-    //             scr.onerror = () => reject(Error('Error loading ' + globalName||scriptUrl))
-                
-    //         } else {
-    //             e => this.loadVideo(e)
-    //         }
-    //     })
-    // }
-
-// 3. This function creates an <iframe> (and YouTube player)
-//    after the API code downloads.
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    // get getOnPlayerReady() {
-    //     // console.log('je suis dans le getter, voici le player : ' +this.player + this.event.target)
-    //     // if (this.player) {
-    //         // console.log('jai utiliser mon play getter')
-    //         // return this.loadVideo(this.event)
-    //         // return this.event.target.playVideo()
-    //         return this.onPlayerReady(this.event[0])
-    //     // }
-    // }
-
-    // get getPlayerEvent() {
-    //     return this.event
-    // }
-
-    
-
-    // get getStopVideo() {
-    //     // if (this.player) {
-    //         console.log(this.player)
-    //         let playEvent = this.getPlayerEvent
-    //         console.log('jai utiliser mon stop getter')
-    //         // this.stopVideo(this.event)
-    //         this.stopVideo(playEvent)
-    //         // this.stopVideo.bind(this)
-    //     // }
-    // }
-
-    // get getPauseVideo() {
-    //     // if (this.player) {
-    //         console.log(this.videoPlayer)
-    //         let playEvent = this.getPlayerEvent
-
-    //         console.log('jai utiliser mon pause getter')
-    //         // this.pauseVideo.bind(this)
-    //         // this.pauseVideo(this.event)
-    //         this.pauseVideo(playEvent)
-    //         // this.pauseVideo()
-    //     // }
-    // }
-}
-
-class YoutubeDisplayPlayer 
+export class YoutubePlayer 
 {
 
     videoPlayer = []
@@ -303,9 +303,12 @@ class YoutubeDisplayPlayer
     player = []
     event = []
 
-    constructor(container) {
-        this.container = container
-
+    /**
+     * @param {Carousel} carousel
+     */
+    constructor(carousel) {
+        this.carousel = carousel
+        this.videoContainer = carousel.container
         // const test = container.querySelector('.player')
         //     console.log(test)
         
@@ -318,10 +321,10 @@ class YoutubeDisplayPlayer
         //     element.addEventListener('mouseover', e => this.onHover(e))
         //     // const test = element.querySelector('.player')
         // })
-
-
-        const containers = this.container.querySelectorAll('.player')
         
+
+        const containers = this.videoContainer.querySelectorAll('.player')
+
         for (const container of containers) {
             // if (this.player.id) {
             //     this.player.id = container.id
@@ -344,15 +347,45 @@ class YoutubeDisplayPlayer
             // this.player[element.id] = container
             // this.player[container.id] = container
             
-            
+
             // this.player.push({
             //     element : container,
             //     id : container.id
             // })
-            window.onYouTubeIframeAPIReady = this.onYouTubeIframeAPIReady.bind(this)
+            // console.log(container)
+            // window.onYouTubeIframeAPIReady = this.onYouTubeIframeAPIReady.bind(this)
+            // container.addEventListener('mouseover', e => this.onHover(e))
+            // this.onHover(container)
+            // this.#createEventListenerFromHover(container , 'mouseover' , 'videoplay', this.onHover(container))
 
         }
+
+        
+
+        this.#iFrameCreation()
+
         console.log(this.player)
+
+
+
+        // this.#createEventListenerFromHover(this.player , 'mouseover' , 'videoplay', this.onHover(container))
+
+        this.carousel.items.forEach(item => {
+            console.log(item)
+            const foundPlayer = item.querySelector('iframe')
+
+            if (foundPlayer) {
+                console.log(foundPlayer)
+                // container.addEventListener('mouseover', e => this.onHover(e))
+
+                // this.#createEventListenerFromHover(item , 'mouseover' , 'videoplay', this.onHover(item))
+                // this.#createEventListenerFromHover(item , 'mouseout' , 'videopause', this.onPointerOut(item))
+            }
+            // item.addEventListener('videoplay', (e) => {
+            //     console.log(e)
+            //     console.log('customeventdsqdssssssssssssssssssssssssssssssssssssssssssssssssssssss')
+            // })
+        })
         
 
         // for (const container of containers) {
@@ -394,6 +427,47 @@ class YoutubeDisplayPlayer
         // window.onYouTubeIframeAPIReady = this.onYouTubeIframeAPIReady.bind(this)
         // e => this.onYouTubeIframeAPIReady.bind(this)
         // this.onYouTubeIframeAPIReady()
+    }
+
+    #iFrameCreation() {
+        const iframe = document.getElementById('videoIFrame')
+
+        if (!iframe) {
+            const tag = document.createElement('script')
+
+            tag.src = 'https://www.youtube.com/iframe_api'
+            tag.setAttribute('id', 'videoIFrame')
+            tag.type = 'text/javascript'
+            // tag.loading = 'lazy'
+            tag.referrerPolicy = 'no-referrer'
+            // tag.type =  'image/svg+xml'
+            // console.log('object')
+            // window.onYouTubeIframeAPIReady = this.loadVideo.bind(this)
+            
+            window.onYouTubeIframeAPIReady = this.onYouTubeIframeAPIReady.bind(this)
+            
+            // this.done = window.done
+            const firstScriptTag = document.getElementsByTagName('script')[0]
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+        } else {
+            // this.loadVideo.bind(this)
+            e => this.loadVideo(e)
+            // this.loadVideo()
+            // console.log(e)
+        }
+    }
+
+    #createEventListenerFromHover(object, eventToListen , customEvent, funct = null, args = null) {
+        object.addEventListener(eventToListen, (e) => {
+            if (funct) funct(args)
+            // console.log('je test mon eventcreateur')
+            let newEvent = new CustomEvent(`${customEvent}`, {
+                bubbles: true,
+                detail: {e, object}
+            }, {once: true})
+
+            object.dispatchEvent(newEvent)
+        })
     }
 
     playVideo(e) {
@@ -448,21 +522,42 @@ class YoutubeDisplayPlayer
      * @param {PointerEvent} e 
      */
     onHover(element) {
-        const foundPlayer = element.querySelector('.player')
-        if(foundPlayer) {
-            element.addEventListener('videoplay', (e) => {
-                // const elem = e.detail.object.querySelector('.player').id
-                const elem = foundPlayer.id
-                if (this.player[elem].event.data !== YT.PlayerState.PLAYING) {
-                    // if (player.id === this.videoPlayer.id) {
-                    this.player[elem].event.target.playVideo()
-                    // this.player[elem].player.playVideo()
-                }
-                return 
-            })
-        }
-        return null
+        console.log(element)
+        console.log('je suis dans le hover')
+        // element.addEventListener('mouseover', e => {
+        //     this.player[element.id].player.playVideo()
+        // })
+        // const foundPlayer = element.querySelector('.player')
+        // if(foundPlayer) {
+        //     element.addEventListener('videoplay', (e) => {
+        //         // const elem = e.detail.object.querySelector('.player').id
+        //         const elem = foundPlayer.id
+        //         if (this.player[elem].event.data !== YT.PlayerState.PLAYING) {
+        //             // if (player.id === this.videoPlayer.id) {
+        //             this.player[elem].event.target.playVideo()
+        //             // this.player[elem].player.playVideo()
+        //         }
+        //         return 
+        //     })
+        // }
+        // return null
     }
+    // onHover(element) {
+    //     const foundPlayer = element.querySelector('.player')
+    //     if(foundPlayer) {
+    //         element.addEventListener('videoplay', (e) => {
+    //             // const elem = e.detail.object.querySelector('.player').id
+    //             const elem = foundPlayer.id
+    //             if (this.player[elem].event.data !== YT.PlayerState.PLAYING) {
+    //                 // if (player.id === this.videoPlayer.id) {
+    //                 this.player[elem].event.target.playVideo()
+    //                 // this.player[elem].player.playVideo()
+    //             }
+    //             return 
+    //         })
+    //     }
+    //     return null
+    // }
 
     getVideoPlayerById(id, playerId) {
         if (playerId === id) {
@@ -662,7 +757,11 @@ class YoutubeDisplayPlayer
     }
 
     onYouTubeIframeAPIReady() {
-        console.log('creation du player')
+        // console.log('creation du player')
+    //     const containers = this.videoContainer.querySelectorAll('.player')
+    //    console.log(containers)
+    //     for (const container in containers) {
+    //     console.log(container)    
         for (const container in this.player) {
             const player = new YT.Player(container, {
                 // width: '360',
@@ -680,7 +779,16 @@ class YoutubeDisplayPlayer
                 }
             })
             // this.player[container].player = {...player}
+            // console.log(player)
             this.player[container].player = player
+            // this.player[container.id] = {
+            //     element: container, 
+            //     id: container.id
+            // }
+
+            // console.log(this.player[container].element)
+
+            // this.player[container].element.addEventListener('mouseover', e => this.onHover(e))
         }
     }
 }
