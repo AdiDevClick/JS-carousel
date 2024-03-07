@@ -137,8 +137,28 @@ export class Carousel
             // console.log(item)
             const foundPlayer = item.querySelector('.player')
             // console.log(foundPlayer)
-            this.#debounceMouse(item, 'mousemove', this.#player.onHover.bind(this))
-            this.#debounceMouse(item, 'mousemove', this.#player.onPointerOut.bind(this))
+            this.#debounceMouse(item, 'mousemove')
+            this.#debounceMouse(item, 'mouseout')
+
+            // item.addEventListener('mouseover', debounce((e) => {
+            //     if (this.getClickStatus || this.getStatus === 'clickComplete')  {
+            //         if (this.getLoadingBar) this.getLoadingBar.style.animationPlayState = 'running'
+            //         this.setScrollingStatus = false
+            //         return
+            //     }
+            //     this.#eventAction = e.clientX
+            //     let X = e.clientX
+            //     let Y = e.clientY
+            //     let mousePosition = X
+
+            //     if (mousePosition !== X) {
+            //         // mousePosition = X
+            //         console.log(mousePosition)
+            //         return mousePosition = X
+            //     }
+            //     this.getStatus === 'hovered' ? this.setStatus = 'canResume' : null
+            //     if (foundPlayer) this.#player.onHover(foundPlayer)
+            // }, 300))
             // item.addEventListener('mouseover', e => {
             //     if (foundPlayer) this.#player.onHover(foundPlayer)
             // })
@@ -203,50 +223,31 @@ export class Carousel
     //     }
     // }
 
-    #debounceMouse(object, event, funct, args = null) {
+    #debounceMouse(object, event) {
         const foundPlayer = object.querySelector('.player')
 
-        args = foundPlayer
         object.addEventListener(event, debounce((e) => {
             
             if (this.getClickStatus || this.getStatus === 'clickComplete')  {
                 if (this.getLoadingBar) this.getLoadingBar.style.animationPlayState = 'running'
-                // console.log('je suis ici')
                 this.setScrollingStatus = false
                 return
             }
-            // const mouseEvent = e.detail.e
             let X = e.clientX
-            // let X = mouseEvent.clientX
-            let Y = e.clientY
-            // let Y = mouseEvent.clientY
             let mousePosition = X
 
-            if (mousePosition !== this.getEventAction) {
-            // if (mousePosition !== this.#eventAction) {
-                // console.log('video not done')
-                // console.log('done status :' + this.done)
+            if (mousePosition !== X) {
                 return mousePosition = X
             }
 
-            // if (video) {
-            //     console.log('jai un iframe')
-            //     return
-            // } else {
-            //     console.log('test')
-            //     this.carousel.status === 'hovered' ? this.carousel.status = 'canResume' : null
-            //     return this.#onPointerOut()
-            // }
-            this.getStatus === 'hovered' ? this.setStatus = 'canResume' : null
+            if (foundPlayer && event === 'mousemove') {
+                this.setScrollingStatus = false
+                this.#player.onHover(foundPlayer)
+            } else if (foundPlayer && event === 'mouseout') {
+                this.setScrollingStatus = false
+                this.#player.onPointerOut(foundPlayer)
+            }
 
-            if (foundPlayer) funct(args)
-            // if (foundPlayer) this.#player.funct(foundPlayer)
-            // return funct(item)
-            // if (video) {
-            //     return
-            // } else {
-            //     return this.#onPointerOut()
-            // }
         }, 300))
     }
 
