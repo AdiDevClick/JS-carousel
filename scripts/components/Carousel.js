@@ -133,7 +133,22 @@ export class Carousel
             this.goToItem(this.#offset, false)
         }
         
-        this.items.forEach(item => this.container.append(item))
+        this.items.forEach(item => {
+            // console.log(item)
+            const foundPlayer = item.querySelector('.player')
+            // console.log(foundPlayer)
+            this.#debounceMouse(item, 'mousemove', this.#player.onHover.bind(this))
+            this.#debounceMouse(item, 'mousemove', this.#player.onPointerOut.bind(this))
+            // item.addEventListener('mouseover', e => {
+            //     if (foundPlayer) this.#player.onHover(foundPlayer)
+            // })
+            // item.addEventListener('mouseout', e => {
+            //     if (foundPlayer) this.#player.onPointerOut(foundPlayer)
+            // })
+            // this.#createEventListenerFromClick(item, 'mousemove' , 'onHover')
+
+            this.container.append(item)
+        })
         this.setStyle()
         if (this.options.navigation) {
             this.#createNavigation()
@@ -173,19 +188,66 @@ export class Carousel
         // console.log(this.#player)
     }
 
-    #iFrameCreation() {
-        const iframe = document.getElementById('videoIFrame')
+    // #iFrameCreation() {
+    //     const iframe = document.getElementById('videoIFrame')
 
-        if (!iframe) {  
-            const tag = document.createElement('script')
-            tag.setAttribute('id', 'videoIFrame')
-            tag.src = "https://www.youtube.com/iframe_api"
-            // tag.type = "module"
-            // tag.origin = "https://127.0.0.1:5500"
+    //     if (!iframe) {  
+    //         const tag = document.createElement('script')
+    //         tag.setAttribute('id', 'videoIFrame')
+    //         tag.src = "https://www.youtube.com/iframe_api"
+    //         // tag.type = "module"
+    //         // tag.origin = "https://127.0.0.1:5500"
             
-            const firstScriptTag = document.getElementsByTagName('script')[0]
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
-        }
+    //         const firstScriptTag = document.getElementsByTagName('script')[0]
+    //         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+    //     }
+    // }
+
+    #debounceMouse(object, event, funct, args = null) {
+        const foundPlayer = object.querySelector('.player')
+
+        args = foundPlayer
+        object.addEventListener(event, debounce((e) => {
+            
+            if (this.getClickStatus || this.getStatus === 'clickComplete')  {
+                if (this.getLoadingBar) this.getLoadingBar.style.animationPlayState = 'running'
+                // console.log('je suis ici')
+                this.setScrollingStatus = false
+                return
+            }
+            // const mouseEvent = e.detail.e
+            let X = e.clientX
+            // let X = mouseEvent.clientX
+            let Y = e.clientY
+            // let Y = mouseEvent.clientY
+            let mousePosition = X
+
+            if (mousePosition !== this.getEventAction) {
+            // if (mousePosition !== this.#eventAction) {
+                // console.log('video not done')
+                // console.log('done status :' + this.done)
+                return mousePosition = X
+            }
+
+            // if (video) {
+            //     console.log('jai un iframe')
+            //     return
+            // } else {
+            //     console.log('test')
+            //     this.carousel.status === 'hovered' ? this.carousel.status = 'canResume' : null
+            //     return this.#onPointerOut()
+            // }
+            this.getStatus === 'hovered' ? this.setStatus = 'canResume' : null
+
+            if (foundPlayer) funct(args)
+            // if (foundPlayer) this.#player.funct(foundPlayer)
+            // return funct(item)
+            // if (video) {
+            //     return
+            // } else {
+            //     return this.#onPointerOut()
+            // }
+        }, 300))
     }
 
     disableTransition() {
@@ -515,9 +577,10 @@ export class Carousel
      * @function funct une fonction associée à l'évènement
      * @param {FunctionStringCallback} args Les arguments de la fonction si nécessaire
      */
-    #createEventListenerFromClick(object, eventToListen , customEvent, animationDelay = false, funct, args) {
+    #createEventListenerFromClick(object, eventToListen , customEvent, animationDelay = false, funct = null, args) {
         object.addEventListener(eventToListen, (e) => {
-            funct(args)
+            if (funct) funct(args)
+            // funct(args)
             this.activateClickStatus()
             let newEvent = new CustomEvent(`${customEvent}`, {
                 bubbles: false,
@@ -829,5 +892,9 @@ export class Carousel
 
     get getIntersectStatus() {
         return this.#intersect
+    }
+
+    get getEventAction() {
+        return this.#eventAction
     }
 }

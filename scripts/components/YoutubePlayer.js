@@ -1,3 +1,4 @@
+import { debounce } from "../functions/dom.js"
 import { Carousel } from "./Carousel.js"
 import { CarouselVideoPlugin } from "./CarouselVideoPlugin.js"
 
@@ -371,13 +372,16 @@ export class YoutubePlayer
         // this.#createEventListenerFromHover(this.player , 'mouseover' , 'videoplay', this.onHover(container))
 
         this.carousel.items.forEach(item => {
-            console.log(item)
-            const foundPlayer = item.querySelector('iframe')
+            // console.log(item)
+            this.itemPlayer = item.querySelector('.player')
+            const foundPlayer = item.querySelector('.player')
+            // console.log(foundPlayer)
 
             if (foundPlayer) {
-                console.log(foundPlayer)
-                // container.addEventListener('mouseover', e => this.onHover(e))
 
+                // console.log(foundPlayer)
+                // container.addEventListener('mouseover', e => this.onHover(e))
+                foundPlayer.addEventListener('onHover', this.onHover.bind(this))
                 // this.#createEventListenerFromHover(item , 'mouseover' , 'videoplay', this.onHover(item))
                 // this.#createEventListenerFromHover(item , 'mouseout' , 'videopause', this.onPointerOut(item))
             }
@@ -386,6 +390,9 @@ export class YoutubePlayer
             //     console.log('customeventdsqdssssssssssssssssssssssssssssssssssssssssssssssssssssss')
             // })
         })
+
+        // console.log(this.itemPlayer)
+        // this.videoContainer.addEventListener('mouseover', this.onHover(this.itemPlayer))
         
 
         // for (const container of containers) {
@@ -522,8 +529,14 @@ export class YoutubePlayer
      * @param {PointerEvent} e 
      */
     onHover(element) {
-        console.log(element)
+        // console.log(element)
         console.log('je suis dans le hover')
+        console.log(this.player)
+        const elem = element.id
+        if (this.player[elem].event.data !== 1) {
+            this.player[elem].player.playVideo()
+        }
+        
         // element.addEventListener('mouseover', e => {
         //     this.player[element.id].player.playVideo()
         // })
@@ -531,10 +544,7 @@ export class YoutubePlayer
         // if(foundPlayer) {
         //     element.addEventListener('videoplay', (e) => {
         //         // const elem = e.detail.object.querySelector('.player').id
-        //         const elem = foundPlayer.id
-        //         if (this.player[elem].event.data !== YT.PlayerState.PLAYING) {
         //             // if (player.id === this.videoPlayer.id) {
-        //             this.player[elem].event.target.playVideo()
         //             // this.player[elem].player.playVideo()
         //         }
         //         return 
@@ -568,26 +578,18 @@ export class YoutubePlayer
         }
     }
 
+
     /**
      * Relance l'animation quand le pointer est enlevé de l'item
      * @param {PointerEvent} e 
      */
     onPointerOut(element) {
-        const foundPlayer = element.querySelector('.player')
-        // console.log(foundPlayer)
-        if(foundPlayer) {
-            element.addEventListener('videopause', (e) => {
-                // const elem = e.detail.object.querySelector('.player').id
-                const elem = foundPlayer.id
-                if (this.player[elem].event.data === YT.PlayerState.PLAYING) {
-                    // if (player.id === this.videoPlayer.id) {
-                    this.player[elem].event.target.pauseVideo()
-                    // this.player[elem].player.playVideo()
-                }
-                return 
-            })
+        console.log('je suis dans le pointerout')
+        console.log(this.player)
+        const elem = element.id
+        if (this.player[elem].event.data === 1) {
+            this.player[elem].player.pauseVideo()
         }
-        return null
         // console.log(element)
         // console.log('jai demander de pause la video')
         // this.container.addEventListener('videopause', (e) => {
@@ -602,6 +604,36 @@ export class YoutubePlayer
         // !this.#hovered && this.carousel.getVideoPlayer ? this.carousel.getVideoPlayer.getPauseVideo : null
         // this.#hovered ? this.player.onPlayerStateChange(this.player) : null
     }
+    // onPointerOut(element) {
+    //     const foundPlayer = element.querySelector('.player')
+    //     // console.log(foundPlayer)
+    //     if(foundPlayer) {
+    //         element.addEventListener('videopause', (e) => {
+    //             // const elem = e.detail.object.querySelector('.player').id
+    //             const elem = foundPlayer.id
+    //             if (this.player[elem].event.data === YT.PlayerState.PLAYING) {
+    //                 // if (player.id === this.videoPlayer.id) {
+    //                 this.player[elem].event.target.pauseVideo()
+    //                 // this.player[elem].player.playVideo()
+    //             }
+    //             return 
+    //         })
+    //     }
+    //     return null
+    //     // console.log(element)
+    //     // console.log('jai demander de pause la video')
+    //     // this.container.addEventListener('videopause', (e) => {
+    //         // console.log(e)
+    //         // console.log('je de hover')
+    //     // })
+    //     // element.pauseVideo()
+    //     // this.pauseVideo()
+    //     // !this.hovered ? this.carousel.getVideoPlayer.getPauseVideo : null
+    //     // !this.#hovered ? this.carousel.getVideoPlayer.getPauseVideo : null
+    //     // this.#hovered ? this.player.onPlayerStateChange(this.player) : null
+    //     // !this.#hovered && this.carousel.getVideoPlayer ? this.carousel.getVideoPlayer.getPauseVideo : null
+    //     // this.#hovered ? this.player.onPlayerStateChange(this.player) : null
+    // }
 
     // 4. The API will call this function when the video player is ready.
     onPlayerReady(event) {
@@ -617,7 +649,7 @@ export class YoutubePlayer
         // this.event.push(e)
         // 
         console.log('je suis dans oinplyer')
-        console.log(event)
+        // console.log(event)
         // this.event.push(event)
 
         // const test = this.player.id
@@ -631,6 +663,9 @@ export class YoutubePlayer
 
         // this.player[element].event = Array.from(this.event)
 
+        // event.data = -1
+        event.target.playVideo()
+        event.target.pauseVideo()
 
         this.player[event.target.o.id].event = event
 
@@ -683,10 +718,10 @@ export class YoutubePlayer
         // if (!this.video.getHoverStatus) {
         // if (this.done) return this.onPlayerReady(event)
         //     return e => onPlayerStateChange(e)
-        console.log('je suis dans le playerstate')
+        // console.log('je suis dans le playerstate')
         // this.event = event
         // console.log(event)
-        console.log(this.event)
+        // console.log(this.event)
         this.player[event.target.o.id].event = event
 
             // console.log(this.video.getHoverStatus)
@@ -780,6 +815,7 @@ export class YoutubePlayer
             })
             // this.player[container].player = {...player}
             // console.log(player)
+            // player.addEventListener('mouseover', e => this.onHover(e))
             this.player[container].player = player
             // this.player[container.id] = {
             //     element: container, 
