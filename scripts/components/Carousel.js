@@ -135,7 +135,7 @@ export class Carousel
         
         this.items.forEach(item => {
             // console.log(item)
-            const foundPlayer = item.querySelector('.player')
+            // const foundPlayer = item.querySelector('.player')
             // console.log(foundPlayer)
             this.#debounceMouse(item, 'mousemove')
             this.#debounceMouse(item, 'mouseout')

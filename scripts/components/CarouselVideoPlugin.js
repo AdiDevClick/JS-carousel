@@ -192,7 +192,7 @@ export class CarouselVideoPlugin {
             let Y = mouseEvent.clientY
             let mousePosition = X
 
-            if (mousePosition !== this.#eventAction) {
+            if (mousePosition !== this.#eventAction && this.carousel.getVideoPlayer.getVideoStatus) {
                 console.log('video not done')
                 console.log('done status :' + this.done)
                 return mousePosition = X
