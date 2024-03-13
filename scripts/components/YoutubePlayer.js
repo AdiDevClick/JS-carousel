@@ -323,53 +323,25 @@ export class YoutubePlayer
         //     element.addEventListener('mouseover', e => this.onHover(e))
         //     // const test = element.querySelector('.player')
         // })
-        
 
         const containers = this.videoContainer.querySelectorAll('.player')
 
         for (const container of containers) {
-            // if (this.player.id) {
-            //     this.player.id = container.id
-            //     console.log(this.player)
-            // } else {
-            //     this.player.id = container.id
-            //     console.log(this.player)
-            // }
-            // this.player.id = container.id
-            // this.player[container.id] = container
-            // this.player.push(
-            //     // this.player.element = container,
-            //     // this.player[container.id] = container
-            // )
             this.player[container.id] = {
                 element: container, 
                 id: container.id
             }
-            // this.player.element = container,
-            // this.player[element.id] = container
-            // this.player[container.id] = container
-            
-
-            // this.player.push({
-            //     element : container,
-            //     id : container.id
-            // })
-            // console.log(container)
-            // window.onYouTubeIframeAPIReady = this.onYouTubeIframeAPIReady.bind(this)
-            // container.addEventListener('mouseover', e => this.onHover(e))
-            // this.onHover(container)
-            // this.#createEventListenerFromHover(container , 'mouseover' , 'videoplay', this.onHover(container))
-
         }
-
-        
 
         this.#iFrameCreation()
 
-        // console.log(this.player)
-
-
-
+        carousel.items.forEach(item => {
+            const foundPlayer = item.querySelector('.player')
+            if (foundPlayer) {
+                item.addEventListener('mouseenter', e => this.onHover(foundPlayer))
+                item.addEventListener('mouseleave', e => this.onPointerOut(foundPlayer))
+            }
+        })
         // this.#createEventListenerFromHover(this.player , 'mouseover' , 'videoplay', this.onHover(container))
 
         // this.carousel.items.forEach(item => {
@@ -446,22 +418,16 @@ export class YoutubePlayer
             tag.src = 'https://www.youtube.com/iframe_api'
             tag.setAttribute('id', 'videoIFrame')
             tag.type = 'text/javascript'
-            // tag.loading = 'lazy'
+            tag.loading = 'lazy'
             tag.referrerPolicy = 'no-referrer'
             // tag.type =  'image/svg+xml'
-            // console.log('object')
-            // window.onYouTubeIframeAPIReady = this.loadVideo.bind(this)
             
             window.onYouTubeIframeAPIReady = this.onYouTubeIframeAPIReady.bind(this)
-            
-            // this.done = window.done
+
             const firstScriptTag = document.getElementsByTagName('script')[0]
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
         } else {
-            // this.loadVideo.bind(this)
-            e => this.loadVideo(e)
-            // this.loadVideo()
-            // console.log(e)
+            e => this.loadVideo.bind(this)
         }
     }
 
@@ -478,65 +444,76 @@ export class YoutubePlayer
         })
     }
 
-    playVideo(e) {
-        // console.log('je demande a play la video, data dans le playvid : ' + e.target)
-        // if (this.video.getHoverStatus === true) {
-        // if (this.video.getHoverStatus) {
-        // if (this.isHovered === true) {
-            console.log(e)
-            console.log(this.players)
-            console.log('play on hover')
-            this.players.playVideo()
-            // this.event.target.playVideo()
-            // this.player.playVideo()
-            this.done  = false
-            // return this.onPlayerStateChange(event)
-        // return
-        // }
-        // return
-        // this.onPlayerStateChange(e)
-    }
+    // playVideo(e) {
+    //     // console.log('je demande a play la video, data dans le playvid : ' + e.target)
+    //     // if (this.video.getHoverStatus === true) {
+    //     // if (this.video.getHoverStatus) {
+    //     // if (this.isHovered === true) {
+    //         console.log(e)
+    //         console.log(this.players)
+    //         console.log('play on hover')
+    //         this.players.playVideo()
+    //         // this.event.target.playVideo()
+    //         // this.player.playVideo()
+    //         this.done  = false
+    //         // return this.onPlayerStateChange(event)
+    //     // return
+    //     // }
+    //     // return
+    //     // this.onPlayerStateChange(e)
+    // }
 
-    get getOnPlayerReady() {
-        // console.log('je suis dans le getter, voici le player : ' +this.player + this.event.target)
-        // if (this.player) {
-            console.log(this.player)
+    // get getOnPlayerReady() {
+    //     // console.log('je suis dans le getter, voici le player : ' +this.player + this.event.target)
+    //     // if (this.player) {
+    //         console.log(this.player)
 
-            console.log('jai utiliser mon play getter')
-            let playEvent = this.getPlayerEvent
-            // return this.loadVideo(this.event)
-            // return this.event.target.playVideo()
-            this.playVideo(playEvent)
-            // this.playVideo()
-            // this.playVideo(playEvent)
-            // this.playVideo.bind(this)
-            // e => e.target.playVideo()
-        // }
-    }
+    //         console.log('jai utiliser mon play getter')
+    //         let playEvent = this.getPlayerEvent
+    //         // return this.loadVideo(this.event)
+    //         // return this.event.target.playVideo()
+    //         this.playVideo(playEvent)
+    //         // this.playVideo()
+    //         // this.playVideo(playEvent)
+    //         // this.playVideo.bind(this)
+    //         // e => e.target.playVideo()
+    //     // }
+    // }
 
     onPlayerError(e) {
         console.log(e)
         console.log('erreur')
     }
 
-    
-
-    get getPlayId() {
-        return this.id.push(this.player.id)
-    }
+    // get getPlayId() {
+    //     return this.id.push(this.player.id)
+    // }
 
     /**
      * Permet de pause l'animation lors d'un mouse hover
      * @param {PointerEvent} e 
      */
     onHover(element) {
-        // console.log(element)
-        console.log('je suis dans le hover')
-        console.log(this.player)
+        console.log(`VideoOnHover check : 
+        click status => ${this.carousel.getClickStatus}
+        scroll status => ${this.carousel.getScrollingStatus} 
+        intersect status => ${this.carousel.getIntersectStatus} 
+        global status => ${this.carousel.getStatus} 
+        videostatus => ${this.carousel.getVideoPlayer.videoStatus}`)
+        console.log('video status : '+this.videoStatus)
+        // console.log('je suis dans le hover')
         const elem = element.id
-        if (this.player[elem].event.data !== 1) {
+        if (this.player[elem].event.data !== 1 && this.done) {
+            this.carousel.endTime
+            this.carousel.setPromiseArray = []
+            if (this.carousel.getLoadingBar) this.carousel.getLoadingBar.style.animationPlayState = 'paused'
+
+            // this.carousel.getLoadingBar.style.animationPlayState = 'paused'
+            this.carousel.setStatus = 'hovered'
+            this.carousel.setScrollingStatus = true
             this.done = false
             this.player[elem].player.playVideo()
+            console.log('jai tout desactiver et lecture')
         }
         
         // element.addEventListener('mouseover', e => {
@@ -571,14 +548,14 @@ export class YoutubePlayer
     //     return null
     // }
 
-    getVideoPlayerById(id, playerId) {
-        if (playerId === id) {
+    // getVideoPlayerById(id, playerId) {
+    //     if (playerId === id) {
 
-            this.playVideo()
-        } else {
+    //         this.playVideo()
+    //     } else {
 
-        }
-    }
+    //     }
+    // }
 
 
     /**
@@ -586,13 +563,24 @@ export class YoutubePlayer
      * @param {PointerEvent} e 
      */
     onPointerOut(element) {
-        console.log('je suis dans le pointerout')
-        console.log(this.player)
+        console.log('video status : '+this.videoStatus)
+        // console.log('je suis dans le pointerout')
         const elem = element.id
-        if (this.player[elem].event.data === 1) {
-            this.done = true
+        if (this.player[elem].event.data === 1 && !this.done) {
+            this.carousel.setPromiseArray = []
+            // this.carousel.setScrollingStatus = false
             this.player[elem].player.pauseVideo()
+            this.carousel.currentTime
+            this.carousel.getClickStatus ? this.carousel.setHoverStatus = false : this.carousel.setHoverStatus = true
+            this.carousel.setHoverStatus = false
+            // this.carousel.setHoverStatus = 'hoveredCompleted'
+            this.carousel.observe(this.carousel.element)
+            // this.carousel.getOnReject
+            // this.carousel.getLoadingBar.style.animationPlayState = 'running'
+
+            // console.log('jai tout desactiver et mise en pause')
         }
+        this.done = true
         // console.log(element)
         // console.log('jai demander de pause la video')
         // this.container.addEventListener('videopause', (e) => {
@@ -651,16 +639,16 @@ export class YoutubePlayer
         // console.log(embedCode)
         // this.event.push(e)
         // 
-        console.log('je suis dans oinplyer')
+        // console.log('je suis dans oinplyer')
         // console.log(event)
         // this.event.push(event)
 
         // const test = this.player.id
         // this.videoPlayer.event = event
         // this.player.video = event
-        this.videoPlayer.push({
-            'this.player.id' : event
-        })
+        // this.videoPlayer.push({
+        //     'this.player.id' : event
+        // })
 
         // console.log(event.target.o.id)
 
@@ -672,17 +660,16 @@ export class YoutubePlayer
 
         this.player[event.target.o.id].event = event
 
-
         // this.player.forEach(element => {
         //     console.log('test3')
             
         // })
         
         // test.push(...event)
-        console.log(this.videoPlayer)
-        console.log(this.event)
-        console.log(this.player)
-        console.log(this.player.video)
+        // console.log(this.videoPlayer)
+        // console.log(this.event)
+        // console.log(this.player)
+        // console.log(this.player.video)
         // event.target.playVideo()
         // console.log(e)
         // e.target.playVideo()
@@ -752,47 +739,47 @@ export class YoutubePlayer
         // }
     }
 
-    stopVideo(e) {
-        // console.log('je demande a stop la video, data dans le playvid : ' + e.target)
-        // if (!this.video.getHoverStatus) {
-        // if (this.isHovered === false) {
-            console.log(this.players)
-            console.log('video stop')
-            e.target.stopVideo()
-            // this.event.target.stopVideo()
-            // this.player.stopVideo()
-            this.done  = true
-            // return this.onPlayerStateChange.bind(this)
-        // }
+    // stopVideo(e) {
+    //     // console.log('je demande a stop la video, data dans le playvid : ' + e.target)
+    //     // if (!this.video.getHoverStatus) {
+    //     // if (this.isHovered === false) {
+    //         console.log(this.players)
+    //         console.log('video stop')
+    //         e.target.stopVideo()
+    //         // this.event.target.stopVideo()
+    //         // this.player.stopVideo()
+    //         this.done  = true
+    //         // return this.onPlayerStateChange.bind(this)
+    //     // }
         
-        // return
-        // return this.onPlayerStateChange.bind(this)
-    }
+    //     // return
+    //     // return this.onPlayerStateChange.bind(this)
+    // }
 
-    pauseVideo(e) {
-        // console.log('je demande a pause la video, data dans le playvid : ' + e.target)
-        // console.log(e)
-        // console.log(this.isHovered)
-        console.log(e)
-        console.log(this.players)
-        // console.log(this.item.getHoverStatus)
-        // if (this.video.getHoverStatus === false) {
-        // if (!this.isHovered) {
-        // if (!this.video.getHoverStatus) {
-            // console.log(this.isHovered)
-            console.log('pause not on hover')
+    // pauseVideo(e) {
+    //     // console.log('je demande a pause la video, data dans le playvid : ' + e.target)
+    //     // console.log(e)
+    //     // console.log(this.isHovered)
+    //     console.log(e)
+    //     console.log(this.players)
+    //     // console.log(this.item.getHoverStatus)
+    //     // if (this.video.getHoverStatus === false) {
+    //     // if (!this.isHovered) {
+    //     // if (!this.video.getHoverStatus) {
+    //         // console.log(this.isHovered)
+    //         console.log('pause not on hover')
            
-            e.target.pauseVideo()
-            // e.pauseVideo()
-            // this.event.target.pauseVideo()
-            // this.player.pauseVideo()
-            // return this.onPlayerStateChange.bind(this)
-        this.done  = true
-        // return
-        // }
-        // return
-        // return this.onPlayerStateChange.bind(this)
-    }
+    //         e.target.pauseVideo()
+    //         // e.pauseVideo()
+    //         // this.event.target.pauseVideo()
+    //         // this.player.pauseVideo()
+    //         // return this.onPlayerStateChange.bind(this)
+    //     this.done  = true
+    //     // return
+    //     // }
+    //     // return
+    //     // return this.onPlayerStateChange.bind(this)
+    // }
 
     onYouTubeIframeAPIReady() {
         // console.log('creation du player')

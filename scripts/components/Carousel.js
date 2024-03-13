@@ -34,9 +34,10 @@ export class Carousel
         entries.forEach(entry => {
             if (entry.intersectionRatio > this.#ratio) {
                 this.#intersect = true
-                this.#whileFalse()
                 this.#animate()
-                this.#showLoadingBar()
+                this.#whileFalse()
+                
+                // this.#showLoadingBar()
                 this.startTime
                 return
             } else {
@@ -101,15 +102,15 @@ export class Carousel
         this.element.append(this.root)
         this.items = children.map(child => {
             const item = createElement('div', {class: 'carousel__item'})
-            // this.#player = new YoutubePlayer(item)
-            // this.#iFrameCreation()
-            // console.log(item)
-            // this.#player = new YoutubePlayer(child)
+            
             item.append(child)
-            
-            
             this.container.append(item)
-            // new YoutubePlayer(child)
+
+            const itemContainer = item.querySelector('.item_container')
+
+            this.#debounceMouse(itemContainer, 'mouseover')
+            this.#debounceMouse(itemContainer, 'mouseleave')
+
             return item
         })
         // console.log(this.#player)
@@ -131,45 +132,14 @@ export class Carousel
                 ...this.items.slice(0, this.#offset).map(item => item.cloneNode(true))
             ]
             this.goToItem(this.#offset, false)
+
+            this.items.forEach(item => {
+                this.container.append(item)
+            })
         }
-        
-        this.items.forEach(item => {
-            // console.log(item)
-            // const foundPlayer = item.querySelector('.player')
-            // console.log(foundPlayer)
-            this.#debounceMouse(item, 'mousemove')
-            this.#debounceMouse(item, 'mouseout')
 
-            // item.addEventListener('mouseover', debounce((e) => {
-            //     if (this.getClickStatus || this.getStatus === 'clickComplete')  {
-            //         if (this.getLoadingBar) this.getLoadingBar.style.animationPlayState = 'running'
-            //         this.setScrollingStatus = false
-            //         return
-            //     }
-            //     this.#eventAction = e.clientX
-            //     let X = e.clientX
-            //     let Y = e.clientY
-            //     let mousePosition = X
-
-            //     if (mousePosition !== X) {
-            //         // mousePosition = X
-            //         console.log(mousePosition)
-            //         return mousePosition = X
-            //     }
-            //     this.getStatus === 'hovered' ? this.setStatus = 'canResume' : null
-            //     if (foundPlayer) this.#player.onHover(foundPlayer)
-            // }, 300))
-            // item.addEventListener('mouseover', e => {
-            //     if (foundPlayer) this.#player.onHover(foundPlayer)
-            // })
-            // item.addEventListener('mouseout', e => {
-            //     if (foundPlayer) this.#player.onPointerOut(foundPlayer)
-            // })
-            // this.#createEventListenerFromClick(item, 'mousemove' , 'onHover')
-
-            this.container.append(item)
-        })
         this.setStyle()
+
         if (this.options.navigation) {
             this.#createNavigation()
         }
@@ -225,9 +195,14 @@ export class Carousel
 
     #debounceMouse(object, event) {
         const foundPlayer = object.querySelector('.player')
+        // const itemBody = object.querySelector('.item__body')
+        // const image = object.querySelector('.item__image')
+        // const img = object.querySelector('img')
+        // const description = object.querySelector('.item__description')
+        // const title = object.querySelector('.item__title')
 
         object.addEventListener(event, debounce((e) => {
-            
+            // e.preventDefault()
             if (this.getClickStatus || this.getStatus === 'clickComplete')  {
                 if (this.getLoadingBar) this.getLoadingBar.style.animationPlayState = 'running'
                 this.setScrollingStatus = false
@@ -235,20 +210,61 @@ export class Carousel
             }
             let X = e.clientX
             let mousePosition = X
+            // // console.log(e.target)
 
             if (mousePosition !== X) {
                 return mousePosition = X
             }
 
-            if (foundPlayer && event === 'mousemove') {
-                this.setScrollingStatus = false
-                this.#player.onHover(foundPlayer)
-            } else if (foundPlayer && event === 'mouseout') {
-                this.setScrollingStatus = false
-                this.#player.onPointerOut(foundPlayer)
+            // if (e.target === itemBody) console.log(e.target)
+
+            // if (e.target === foundPlayer && event === 'mouseover') {
+            //     // if (e.target === object) {
+            //     if (e.target === itemBody || e.target === image || e.target === title || e.target === description) {
+            //         this.setScrollingStatus = false
+            //         this.#player.onHover(foundPlayer)
+            //     } else {
+            //         console.log('object')
+            //         this.setScrollingStatus = false
+            //         this.#player.onPointerOut(foundPlayer)
+            //     }
+            //     // } else if (e.target !== object) {
+                    
+            //     // }
+            // }
+            if (foundPlayer) {
+                if (event === 'mouseover') {
+                    // console.log(e.target)
+            // if (foundPlayer && event === 'mouseout') {
+                    this.setScrollingStatus = false
+                    this.#player.onHover(foundPlayer)
+                // if (e.target === object) {
+                //     console.log('test')
+                //     return
+                // // if (e.target === itemBody || e.target === image || e.target === title || e.target === description) {
+                // //     console.log('test')
+                // //     return
+                } else if (event === 'mouseleave') {
+                // } else {
+                // if (e.target !== itemBody && e.target !== img && e.target !== image && e.target !== title && e.target !== description) {
+                // if (e.target !== itemBody || e.target !== image || e.target !== title || e.target !== description) {
+                // if (e.target === object) {
+                
+                    this.setScrollingStatus = false
+                    this.#player.onPointerOut(foundPlayer)
+                // } else {
+                    // return
+                }
+                // if (e.target !== object) {
+                // if (e.target === itemBody) {
+                    
+                    
+                // } else {
+                    
+                // }
             }
 
-        }, 300))
+        }, 100))
     }
 
     disableTransition() {
@@ -295,7 +311,10 @@ export class Carousel
      */
     #showLoadingBar() {
         if (this.#loadingBar) {
-            if (this.#loadingBar) this.#loadingBar.style.animationPlayState = 'running'
+            console.log('je suis dans le showloadingbar')
+            this.#loadingBar.style.animationPlayState === 'paused' ? this.#loadingBar.style.animationPlayState = 'running' : null
+            
+            // if (this.#loadingBar) this.#loadingBar.style.animationPlayState = 'running'
             this.#loadingBar.style.display = 'none'
             this.#loadingBar.style.display = 'block'
         }
@@ -324,6 +343,7 @@ export class Carousel
      */
     #animate() {
         if (this.#loadingBar && this.#reverseAnimation && this.#intersect || this.#status === 'inverseComplete') {
+            console.log('je suis dans animate')
             this.#reverseAnimation = false
             this.#loadingBar.classList.remove('carousel__pagination__loadingBar--fade')
             this.#loadingBar.removeAttribute('style')
@@ -435,35 +455,55 @@ export class Carousel
     //     }
     // }
     async #whileFalse() {
-        if (this.#scrolling || !this.#intersect || this.#status === 'hovered') return
+        console.log('jentre dans le while')
+        if (this.#scrolling || !this.#intersect) {
+        // if (this.#scrolling || !this.#intersect || this.#status === 'hovered') {
+            console.log(`Fail check : 
+    click status => ${this.getClickStatus}
+    scroll status => ${this.getScrollingStatus} 
+    intersect status => ${this.getIntersectStatus} 
+    global status => ${this.getStatus} 
+    videostatus => ${this.#player.videoStatus}`)
+            
+            return
+        }
         // if (this.#scrolling || !this.#intersect || this.#status === 'hovered' || this.#hovered) return
-        
+        // console.log('jai passé le check')
         try {
             // console.log('je suis dans le while')
-            if ((this.#click || this.#status === 'clicked')) {
+            if (this.#click || this.#status === 'clicked') {
                 this.#resolvedPromisesArray.push(await waitAndFail(100, "j'ai clic"))
-                // console.log('je demande un fail')
+                console.log('je demande un fail')
                 array = this.#resolvedPromisesArray.length 
             } else if (this.#status !== 'hoveredCompleted' && !this.#click){
                 this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration, "J'ai demandé un slide normal"))
-                // console.log('je demande un slide normal')
+                console.log('je demande un slide normal')
             } else {
                 this.#resolvedPromisesArray = []
                 this.#resolvedPromisesArray.push(await wait(this.#currentTime, "J'ai demandé un slide après un hover"))
-                // console.log('je demande un hover')
+                console.log('je demande un hover')
             }
             let array = this.#resolvedPromisesArray.length
             const r = await this.getStates
             if (r.status === 'rejected') {
                     throw new Error(`Promesse ${r.reason} non tenable`, {cause: r.reason})
                 }
+                console.log(`Premier check : 
+        click status => ${this.getClickStatus}
+        scroll status => ${this.getScrollingStatus}
+        intersect status => ${this.getIntersectStatus}
+        global status => ${this.getStatus}
+        videostatus => ${this.#player.videoStatus}`)
+
             if (!this.#click || this.#status === 'hoveredCompleted' || this.#status === 'canResume') {
                 // console.log('je demande un fulfill')
+
                 this.#scrolling = true
                 this.#onFulfilled(array)
             }
             return
         } catch (error) {
+            console.log(error)
             this.#onReject()
         }
     }
@@ -627,19 +667,27 @@ export class Carousel
      * @param {number} duration 
      */
     #delayAnimation(duration) {
-        if (this.#loadingBar) {
+        if (this.#loadingBar && this.#intersect) {
             this.#showLoadingBar()
             this.#animate()
             // 
+            // console.log('duration demandée : ' + duration)
             // console.log('duration : ' + duration)
             this.#loadingBar.style.animationDuration = `${duration}ms`
-            if (this.#intersect) {
-                this.#showLoadingBar()
-                this.#animate()
-                // console.log('ca intersect')
-            }
+            // if (this.#intersect) {
+            //     // this.#showLoadingBar()
+            //     this.#animate()
+            //     // console.log('ca intersect')
+            // }
         }
     }
+
+    // #delayAnimation(duration) {
+    //     if (this.#loadingBar) {
+    //         this.#loadingBar.style.animationDuration = `${duration}ms`
+    //         if (this.#intersect) this.#showLoadingBar()
+    //     }
+    // }
 
     /**
      * @returns {@function | delayAnimation}
@@ -897,5 +945,13 @@ export class Carousel
 
     get getEventAction() {
         return this.#eventAction
+    }
+
+    get getWhileFalse() {
+        return this.#whileFalse()
+    }
+
+    get getOnReject() {
+        return this.#onReject()
     }
 }
