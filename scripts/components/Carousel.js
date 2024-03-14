@@ -461,12 +461,12 @@ export class Carousel
         console.log('jentre dans le while')
         if (this.#scrolling || !this.#intersect) {
         // if (this.#scrolling || !this.#intersect || this.#status === 'hovered') {
-            console.log(`Fail check : 
-    click status => ${this.getClickStatus}
-    scroll status => ${this.getScrollingStatus} 
-    intersect status => ${this.getIntersectStatus} 
-    global status => ${this.getStatus} 
-    videostatus => ${this.#player.videoStatus}`)
+    //         console.log(`Fail check : 
+    // click status => ${this.getClickStatus}
+    // scroll status => ${this.getScrollingStatus} 
+    // intersect status => ${this.getIntersectStatus} 
+    // global status => ${this.getStatus} 
+    // videostatus => ${this.#player.videoStatus}`)
             
             return
         }
@@ -474,30 +474,32 @@ export class Carousel
         // if (this.#scrolling || !this.#intersect || this.#status === 'hovered' || this.#hovered) return
         // console.log('jai passé le check')
         try {
-            console.log(`Try check : 
-    click status => ${this.getClickStatus}
-    scroll status => ${this.getScrollingStatus} 
-    intersect status => ${this.getIntersectStatus} 
-    global status => ${this.getStatus} 
-    videostatus => ${this.#player.videoStatus}
-    hoverStatus => ${this.getHoverStatus}`)
+    //         console.log(`Try check : 
+    // click status => ${this.getClickStatus}
+    // scroll status => ${this.getScrollingStatus} 
+    // intersect status => ${this.getIntersectStatus} 
+    // global status => ${this.getStatus} 
+    // videostatus => ${this.#player.videoStatus}
+    // hoverStatus => ${this.getHoverStatus}
+    // already hover Status => ${this.#alreadyHovered}`)
             // console.log('je suis dans le while')
-            console.log('mon current Time dans le while falmse => '+this.#currentTime)
             if (this.#click || this.#status === 'clicked') {
+                // this.#resolvedPromisesArray = []
                 this.#resolvedPromisesArray.push(await waitAndFail(100, "j'ai clic"))
-                console.log('je demande un fail')
+                // console.log('je demande un fail')
                 array = this.#resolvedPromisesArray.length 
             } else if (!this.#click && this.getHoverStatus) {
+                // console.log('je demander un hover alors que je devrais pas')
                 this.#hovered = false
                 // this.#alreadyHovered = false
 
-                this.#resolvedPromisesArray = []
-                console.log('currenttime calculation => ' + this.#currentTime)
+                // this.#resolvedPromisesArray = []
+                // console.log('currenttime calculation => ' + this.#currentTime)
                 this.#resolvedPromisesArray.push(await wait(this.#currentTime, "J'ai demandé un slide après un hover"))
-                console.log('je demande un hover')
+                // console.log('je demande un hover')
             } else {
                 this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration, "J'ai demandé un slide normal"))
-                console.log('je demande un slide normal')
+                console.log('je demande un slide normal, autoslide duration => '+this.#autoSlideDuration)
             }
             // if (this.#click || this.#status === 'clicked') {
             //     this.#resolvedPromisesArray.push(await waitAndFail(100, "j'ai clic"))
@@ -507,6 +509,7 @@ export class Carousel
             //     this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration, "J'ai demandé un slide normal"))
             //     console.log('je demande un slide normal')
             // } else {
+            //     this.#hovered = false
             //     this.#resolvedPromisesArray = []
             //     this.#resolvedPromisesArray.push(await wait(this.#currentTime, "J'ai demandé un slide après un hover"))
             //     console.log('je demande un hover')
@@ -565,6 +568,7 @@ export class Carousel
      */
     #onReject() {
         if (this.#click) {
+            console.log('je suis dans le onreject')
             this.#resolvedPromisesArray = []
             this.#click = false
             this.#scrolling ? this.#scrolling = false : null
@@ -621,6 +625,9 @@ export class Carousel
         return this.#startTime = performance.now()
     }
 
+    /**
+     * Crer un timer secondaire après un premier hover
+     */
     get startTimeAlreadyHovered() {
         return this.#alreadyHoveredStartTime = performance.now()
     }
@@ -633,6 +640,9 @@ export class Carousel
         return this.#endTime = performance.now()
     }
 
+    /**
+     * Crer un timer secondaire après un premier hover
+     */
     get endTimeAlreadyHovered() {
         // this.#endTime = 0
         return this.#alreadyHoveredEndTime = performance.now()
@@ -644,27 +654,11 @@ export class Carousel
     get currentTime() {
         let time
         time = this.#endTime - this.#startTime
-        if (this.#alreadyHovered) {
-            console.log('je calcule car je suis deja hover')
+        if (this.#alreadyHovered && !this.#click) {
             time = this.#currentTime - (this.#alreadyHoveredEndTime - this.#alreadyHoveredStartTime)
-            // time = time + this.#alreadyHoveredEndTime - this.#alreadyHoveredStartTime
-            // return this.#currentTime = this.#autoSlideDuration - time
-        
-            // this.#currentTime = 0
-            // time = this.#endTime - this.#startTime
             return this.#currentTime = time
         }
-        console.log('calcul du time => '+time)
         return this.#currentTime = this.#autoSlideDuration - time
-        // if (this.#alreadyHovered) {
-        //     console.log('start timer du alreadyhovere => '+this.#alreadyHoveredStartTime)
-        //     console.log('end timer du alreadyhovere => '+this.#alreadyHoveredEndTime)
-        //     console.log('je calcule deja hobvered')
-        //     time = (this.#endTime - this.#startTime) + (this.#alreadyHoveredEndTime - this.#alreadyHoveredStartTime)
-        //     // time = (this.#alreadyHoveredEndTime - this.#alreadyHoveredStartTime)
-        //     // return this.#currentTime  = this.#autoSlideDuration - time
-        // }
-        
     }
     
     /**
