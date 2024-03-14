@@ -573,6 +573,7 @@ export class YoutubePlayer
             this.carousel.currentTime
             this.carousel.getClickStatus ? this.carousel.setHoverStatus = false : this.carousel.setHoverStatus = true
             this.carousel.setHoverStatus = false
+            this.carousel.setScrollingStatus = false
             // this.carousel.setHoverStatus = 'hoveredCompleted'
             this.carousel.observe(this.carousel.element)
             // this.carousel.getOnReject
