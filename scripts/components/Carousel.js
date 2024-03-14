@@ -37,12 +37,15 @@ export class Carousel
                 this.#animate()
                 this.#whileFalse()
                 
-                // this.#showLoadingBar()
+                this.#showLoadingBar()
                 this.startTime
+                console.log('je suis dans le handler')
                 return
             } else {
                 !this.#reverseAnimation ? this.#bubbleAnimation() : null
                 this.#intersect = false
+                this.#hovered = false
+                // this.#resolvedPromisesArray = []
                 return
             }
         })
@@ -61,6 +64,7 @@ export class Carousel
     #alreadyHovered
     #alreadyHoveredStartTime = 0
     #alreadyHoveredEndTime = 0
+    #delay
 
     /**
      * @param {HTMLElement} element 
@@ -314,7 +318,7 @@ export class Carousel
      */
     #showLoadingBar() {
         if (this.#loadingBar) {
-            console.log('je suis dans le showloadingbar')
+            // console.log('je suis dans le showloadingbar')
             this.#loadingBar.style.animationPlayState === 'paused' ? this.#loadingBar.style.animationPlayState = 'running' : null
             
             // if (this.#loadingBar) this.#loadingBar.style.animationPlayState = 'running'
@@ -346,7 +350,7 @@ export class Carousel
      */
     #animate() {
         if (this.#loadingBar && this.#reverseAnimation && this.#intersect || this.#status === 'inverseComplete') {
-            console.log('je suis dans animate')
+            // console.log('je suis dans animate')
             this.#reverseAnimation = false
             this.#loadingBar.classList.remove('carousel__pagination__loadingBar--fade')
             this.#loadingBar.removeAttribute('style')
@@ -458,7 +462,7 @@ export class Carousel
     //     }
     // }
     async #whileFalse() {
-        console.log('jentre dans le while')
+        // console.log('jentre dans le while')
         if (this.#scrolling || !this.#intersect) {
         // if (this.#scrolling || !this.#intersect || this.#status === 'hovered') {
     //         console.log(`Fail check : 
@@ -474,21 +478,24 @@ export class Carousel
         // if (this.#scrolling || !this.#intersect || this.#status === 'hovered' || this.#hovered) return
         // console.log('jai passé le check')
         try {
-    //         console.log(`Try check : 
-    // click status => ${this.getClickStatus}
-    // scroll status => ${this.getScrollingStatus} 
-    // intersect status => ${this.getIntersectStatus} 
-    // global status => ${this.getStatus} 
-    // videostatus => ${this.#player.videoStatus}
-    // hoverStatus => ${this.getHoverStatus}
-    // already hover Status => ${this.#alreadyHovered}`)
+            console.log(`Try check : 
+    click status => ${this.getClickStatus}
+    scroll status => ${this.getScrollingStatus} 
+    intersect status => ${this.getIntersectStatus} 
+    global status => ${this.getStatus} 
+    videostatus => ${this.#player.videoStatus}
+    hoverStatus => ${this.getHoverStatus}
+    already hover Status => ${this.#alreadyHovered}`)
             // console.log('je suis dans le while')
-            if (this.#click || this.#status === 'clicked') {
+            if (this.#click) {
+            // if (this.#click || this.#status === 'clicked') {
                 // this.#resolvedPromisesArray = []
                 this.#resolvedPromisesArray.push(await waitAndFail(100, "j'ai clic"))
-                // console.log('je demande un fail')
+                console.log('je demande un fail')
                 array = this.#resolvedPromisesArray.length 
             } else if (!this.#click && this.getHoverStatus) {
+                // this.#animate()
+
                 // console.log('je demander un hover alors que je devrais pas')
                 this.#hovered = false
                 // this.#alreadyHovered = false
@@ -496,10 +503,13 @@ export class Carousel
                 // this.#resolvedPromisesArray = []
                 // console.log('currenttime calculation => ' + this.#currentTime)
                 this.#resolvedPromisesArray.push(await wait(this.#currentTime, "J'ai demandé un slide après un hover"))
-                // console.log('je demande un hover')
+                console.log('je demande un hover')
             } else {
+
+                console.log('afterclic delay => '+this.afterClickDelay)
                 this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration, "J'ai demandé un slide normal"))
-                console.log('je demande un slide normal, autoslide duration => '+this.#autoSlideDuration)
+                console.log('je demande un slide normal')
+                // console.log('je demande un slide normal, autoslide duration => '+this.#autoSlideDuration)
             }
             // if (this.#click || this.#status === 'clicked') {
             //     this.#resolvedPromisesArray.push(await waitAndFail(100, "j'ai clic"))
@@ -519,12 +529,12 @@ export class Carousel
             if (r.status === 'rejected') {
                     throw new Error(`Promesse ${r.reason} non tenable`, {cause: r.reason})
                 }
-                console.log(`Premier check : 
-        click status => ${this.getClickStatus}
-        scroll status => ${this.getScrollingStatus}
-        intersect status => ${this.getIntersectStatus}
-        global status => ${this.getStatus}
-        videostatus => ${this.#player.videoStatus}`)
+        //         console.log(`Premier check : 
+        // click status => ${this.getClickStatus}
+        // scroll status => ${this.getScrollingStatus}
+        // intersect status => ${this.getIntersectStatus}
+        // global status => ${this.getStatus}
+        // videostatus => ${this.#player.videoStatus}`)
 
             // if (!this.#click) {
             if (!this.#click || this.#status === 'hoveredCompleted' || this.#status === 'canResume') {
@@ -568,9 +578,10 @@ export class Carousel
      */
     #onReject() {
         if (this.#click) {
-            console.log('je suis dans le onreject')
+            // console.log('je suis dans le onreject')
             this.#resolvedPromisesArray = []
             this.#click = false
+            this.#hovered = false
             this.#scrolling ? this.#scrolling = false : null
             this.#status = 'clickComplete'
             if (this.#status === 'clickComplete') return this.observe(this.element)
@@ -724,7 +735,7 @@ export class Carousel
             this.#animate()
             // 
             // console.log('duration demandée : ' + duration)
-            // console.log('duration : ' + duration)
+            console.log('duration : ' + duration)
             this.#loadingBar.style.animationDuration = `${duration}ms`
             // if (this.#intersect) {
             //     // this.#showLoadingBar()
@@ -745,7 +756,12 @@ export class Carousel
      * @returns {@function | delayAnimation}
      */
     get getAnimationDelay() {
-        if (!this.#click) return this.#delayAnimation(this.#autoSlideDuration)
+        if (!this.#click) {
+            this.#delay = this.#autoSlideDuration
+            this.#delayAnimation(this.#autoSlideDuration)
+            // return this.#delayAnimation(this.#autoSlideDuration)
+        }
+        this.#delay = this.afterClickDelay + this.#autoSlideDuration
         return this.#delayAnimation(this.afterClickDelay + this.#autoSlideDuration)
     }
 

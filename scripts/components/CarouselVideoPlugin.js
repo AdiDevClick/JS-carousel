@@ -96,12 +96,12 @@ export class CarouselVideoPlugin {
         }
         // if (this.carousel.getClickStatus) return
         // console.log('je hover, done status : ' + this.done + 'hover status : '+ this.#hovered + ' carousel status : '+this.carousel.getStatus)
-        console.log(`Hover Check :)
-        click status => ${this.carousel.getClickStatus}
-        scroll status => ${this.carousel.getScrollingStatus} 
-        intersect status => ${this.carousel.getIntersectStatus} 
-        global status => ${this.carousel.getStatus} 
-        videostatus => ${this.carousel.getVideoPlayer.videoStatus}`)
+        // console.log(`Hover Check :)
+        // click status => ${this.carousel.getClickStatus}
+        // scroll status => ${this.carousel.getScrollingStatus} 
+        // intersect status => ${this.carousel.getIntersectStatus} 
+        // global status => ${this.carousel.getStatus} 
+        // videostatus => ${this.carousel.getVideoPlayer.videoStatus}`)
         
         // if (this.carousel.getClickStatus || this.carousel.getStatus === 'hovered') return
         // this.carousel.getClickStatus ? this.carousel.setHoverStatus = false : this.carousel.setHoverStatus = true
