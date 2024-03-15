@@ -487,26 +487,38 @@ export class Carousel
     hoverStatus => ${this.getHoverStatus}
     already hover Status => ${this.#alreadyHovered}`)
             // console.log('je suis dans le while')
+            // if(this.#click && this.#hovered) {
+            //     this.#currentTime = 
+            // }
+            
+
             if (this.#click) {
+                // debugger
             // if (this.#click || this.#status === 'clicked') {
                 // this.#resolvedPromisesArray = []
                 this.#resolvedPromisesArray.push(await waitAndFail(100, "j'ai clic"))
                 console.log('je demande un fail')
                 array = this.#resolvedPromisesArray.length 
-            } else if (!this.#click && this.getHoverStatus) {
+            } 
+            if (this.#hovered && this.#status === 'hoveredCompleted' || this.#status === 'hovered' ) {
+            // } else if (this.getHoverStatus || (this.#click && this.getHoverStatus)) {
+                // debugger
                 // this.#animate()
-
+                // console.log()
+                // this.#currentTime !== 0 ? this.currentTime : null
                 // console.log('je demander un hover alors que je devrais pas')
                 this.#hovered = false
                 // this.#alreadyHovered = false
 
                 // this.#resolvedPromisesArray = []
-                // console.log('currenttime calculation => ' + this.#currentTime)
+                console.log('currenttime calculation => ' + this.#currentTime)
                 this.#resolvedPromisesArray.push(await wait(this.#currentTime, "J'ai demandé un slide après un hover"))
+                // this.#resolvedPromisesArray.push(await wait(this.#currentTime, "J'ai demandé un slide après un hover"))
                 console.log('je demande un hover')
+                
             } else {
-
-                console.log('afterclic delay => '+this.afterClickDelay)
+                // this.#hovered = false
+                console.log('delay dans le normal => '+this.#currentTime)
                 this.#resolvedPromisesArray.push(await wait(this.#autoSlideDuration, "J'ai demandé un slide normal"))
                 console.log('je demande un slide normal')
                 // console.log('je demande un slide normal, autoslide duration => '+this.#autoSlideDuration)
@@ -537,6 +549,7 @@ export class Carousel
         // videostatus => ${this.#player.videoStatus}`)
 
             // if (!this.#click) {
+                this.#currentTime = 0
             if (!this.#click || this.#status === 'hoveredCompleted' || this.#status === 'canResume') {
                 // console.log('je demande un fulfill')
 
@@ -580,8 +593,13 @@ export class Carousel
         if (this.#click) {
             // console.log('je suis dans le onreject')
             this.#resolvedPromisesArray = []
+            // if (this.#click && this.#hovered) {
+            //     null
+            // } else {
+                // this.#hovered = false
+            // }
+
             this.#click = false
-            this.#hovered = false
             this.#scrolling ? this.#scrolling = false : null
             this.#status = 'clickComplete'
             if (this.#status === 'clickComplete') return this.observe(this.element)
@@ -667,8 +685,27 @@ export class Carousel
         time = this.#endTime - this.#startTime
         if (this.#alreadyHovered && !this.#click) {
             time = this.#currentTime - (this.#alreadyHoveredEndTime - this.#alreadyHoveredStartTime)
+            console.log('time 2')
+            // this.#currentTime = time
+            // return this.#currentTime
             return this.#currentTime = time
         }
+        // if (!this.#click && this.#scrolling) {
+        //     time = this.#autoSlideDuration
+        //     console.log('time 3')
+        //     // this.#currentTime = time
+        //     // return this.#currentTime
+        //     return this.#currentTime = time
+        // }
+        // if (this.#click) {
+        //     console.log('time 3')
+        //     // this.#currentTime = (this.#autoSlideDuration + this.afterClickDelay) - time
+        //     // return this.#currentTime
+        //     return this.#currentTime = (this.#autoSlideDuration + this.afterClickDelay) - time
+        // }
+        console.log('time 1')
+        // this.#currentTime = this.#autoSlideDuration - time
+        // return this.#currentTime
         return this.#currentTime = this.#autoSlideDuration - time
     }
     
@@ -683,6 +720,7 @@ export class Carousel
      */
     #createEventListenerFromClick(object, eventToListen , customEvent, animationDelay = false, funct = null, args) {
         object.addEventListener(eventToListen, (e) => {
+            // debugger
             if (funct) funct(args)
             // funct(args)
             this.activateClickStatus()
@@ -710,6 +748,7 @@ export class Carousel
                     return
                 } else {
                     this.#scrolling = false
+                    // debugger
                     return this.observe(this.element)
                 }
             }
@@ -758,8 +797,8 @@ export class Carousel
     get getAnimationDelay() {
         if (!this.#click) {
             this.#delay = this.#autoSlideDuration
-            this.#delayAnimation(this.#autoSlideDuration)
-            // return this.#delayAnimation(this.#autoSlideDuration)
+            // this.#delayAnimation(this.#autoSlideDuration)
+            return this.#delayAnimation(this.#autoSlideDuration)
         }
         this.#delay = this.afterClickDelay + this.#autoSlideDuration
         return this.#delayAnimation(this.afterClickDelay + this.#autoSlideDuration)
@@ -827,6 +866,7 @@ export class Carousel
     }
 
     prev() {
+        this.#alreadyHovered = false
         this.goToItem(this.currentItem - this.#slidesToScroll)
     }
 

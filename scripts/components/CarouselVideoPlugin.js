@@ -30,7 +30,6 @@ export class CarouselVideoPlugin {
             // if (this.player) this.videoPlayer = new YoutubePlayer(item)
 
             if (carousel.getClickStatus !== true || carousel.getStatus !== 'clicked') {
-
                 this.#createEventListenerFromMouse(item, 'mousemove' , 'mouseDebounce', false, this.#onHover.bind(this))
                 // this.#createEventListenerFromMouse(item, 'touchstart' , 'mouseDebounce', false, this.#onHover.bind(this))
                 this.#debounceMouse(item, 'mouseDebounce')
@@ -94,6 +93,14 @@ export class CarouselVideoPlugin {
             this.carousel.endTimeAlreadyHovered
 
         }
+        console.log('je suis quand meme rentré dans le hover')
+        // if (!this.carousel.getClickStatus) {
+
+        // this.carousel.setHoverStatus ? this.carousel.setHoverStatus = false : this.carousel.setHoverStatus = true
+        // this.carousel.getClickStatus ? this.#hovered = false : this.#hovered = true
+
+        this.#hovered = true
+        this.carousel.setHoverStatus = true
         // if (this.carousel.getClickStatus) return
         // console.log('je hover, done status : ' + this.done + 'hover status : '+ this.#hovered + ' carousel status : '+this.carousel.getStatus)
         // console.log(`Hover Check :)
@@ -107,12 +114,11 @@ export class CarouselVideoPlugin {
         // this.carousel.getClickStatus ? this.carousel.setHoverStatus = false : this.carousel.setHoverStatus = true
         this.carousel.endTime
         this.carousel.setPromiseArray = []
-
         this.carousel.getStatus === 'hoveredCompleted' || this.carousel.getStatus === 'clickComplete' ? this.carousel.setStatus = 'hovered' : this.carousel.setStatus = 'hovered'
         // this.carousel.getStatus === 'canResume' ? null : this.#hovered = true
         // this.carousel.getLoadingBar.style.animationPlayState = 'paused'
         if (this.carousel.getLoadingBar) this.carousel.getLoadingBar.style.animationPlayState = 'paused'
-
+        // }
     }
 
     /**
@@ -120,9 +126,10 @@ export class CarouselVideoPlugin {
      * @param {PointerEvent} e 
      */
     #onPointerOut(e) {
-        if (this.carousel.getClickStatus) return
+        // if (this.carousel.getClickStatus) return
         
         if (this.carousel.getStatus === 'canResume') {
+            // console.log(('object'))
             
             this.carousel.setStatus = 'hoveredCompleted'
             // this.carousel.setHoverStatus = false
@@ -174,8 +181,17 @@ export class CarouselVideoPlugin {
             //     // this.carousel.getLoadingBar.style.animationPlayState = 'paused'
             //     // this.carousel.setStatus = 'hoveredCompleted'
             // }
-
+            console.log(`mouse listener check : 
+            click status => ${this.carousel.getClickStatus}
+            scroll status => ${this.carousel.getScrollingStatus} 
+            intersect status => ${this.carousel.getIntersectStatus} 
+            global status => ${this.carousel.getStatus} 
+            videostatus => ${this.carousel.getVideoPlayer.videoStatus}
+            hoverStatus => ${this.carousel.getHoverStatus}
+            already hover Status => ${this.carousel.isAlreadyHovered}`)
+            // if (funct) funct(args)
             if (funct && (!this.#hovered || !this.carousel.getClickStatus) && this.carousel.getStatus !== 'hovered') funct(args)
+            // if (funct && (!this.#hovered || !this.carousel.getClickStatus) && this.carousel.getStatus !== 'hovered') funct(args)
 
             //default
             // if (funct && this.carousel.getStatus !== 'hovered') funct(args)
@@ -194,8 +210,15 @@ export class CarouselVideoPlugin {
             this.#eventAction = e.clientX
             this.carousel.setPromiseArray = []
             // console.log('click status dans le debounce : ', this.carousel.getClickStatus)
-            this.carousel.getClickStatus ? this.carousel.setHoverStatus = false : this.carousel.setHoverStatus = true
+
+            // this.carousel.setHoverStatus = true
+
+            // this.carousel.getClickStatus ? this.carousel.setHoverStatus = false : this.carousel.setHoverStatus = true
             this.carousel.getClickStatus ? this.#hovered = false : this.#hovered = true
+
+            // this.#hovered = true
+            // this.carousel.setHoverStatus = true
+
             // this.carousel.getClickStatus ? this.setHoverStatus = false : this.setHoverStatus = true
             // console.log('item hover status : ' + object.getHoverStatus + ' hover status : ' + this.getHoverStatus, 'carousel hover status : ' + this.carousel.getHoverStatus)
             // this.carousel.getClickStatus ? this.this.#hovered = false : this.#hovered = true
@@ -221,12 +244,12 @@ export class CarouselVideoPlugin {
     #debounceMouse(object, event) {
         object.addEventListener(event, debounce((e) => {
             
-            if (this.carousel.getClickStatus || this.carousel.getStatus === 'clickComplete') {
-                if (this.carousel.getLoadingBar) this.carousel.getLoadingBar.style.animationPlayState = 'running'
-                // console.log('je suis ici')
-                this.carousel.setScrollingStatus = false
-                return
-            }
+            // if (this.carousel.getClickStatus || this.carousel.getStatus === 'clickComplete') {
+            //     if (this.carousel.getLoadingBar) this.carousel.getLoadingBar.style.animationPlayState = 'running'
+            //     // console.log('je suis ici')
+            //     this.carousel.setScrollingStatus = false
+            //     return
+            // }
             const mouseEvent = e.detail.e
             let X = mouseEvent.clientX
             let Y = mouseEvent.clientY
@@ -244,6 +267,7 @@ export class CarouselVideoPlugin {
             //     console.log('jai un iframe')
             //     return
             // } else {
+
             //     console.log('test')
             //     this.carousel.status === 'hovered' ? this.carousel.status = 'canResume' : null
             //     return this.#onPointerOut()
